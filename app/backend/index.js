@@ -6,6 +6,11 @@ const app = express();
 app.use(cors());  // Enable CORS for all routes
 app.use(express.json());
 
+// Serve the welcome page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // CRUD operations for authors
 app.post('/authors', (req, res) => {
     const { first_name, middle_name, last_name } = req.body;
