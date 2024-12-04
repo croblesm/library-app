@@ -15,7 +15,7 @@ const config = {
 
 sql.connect(config, err => {
     if (err) console.log(err);
-    console.log('Connected to SQL Server');
+    console.log(`Connected to database: ${process.env.DB_DATABASE}`);
 });
 
 module.exports = sql;

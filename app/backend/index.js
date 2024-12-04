@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');  // Import the cors package
 const sql = require('./db');
+const path = require('path');  // Import the path module
 
 const app = express();
 app.use(cors());  // Enable CORS for all routes

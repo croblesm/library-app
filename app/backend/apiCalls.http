@@ -1,0 +1,5 @@
+## Authors API
+GET http://localhost:3000/authors
+
+### Books API
+GET http://localhost:3000/books
