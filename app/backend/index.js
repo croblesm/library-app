@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { getSequelize } = require('./config/db'); // Import async DB initializer
@@ -30,9 +33,17 @@ const syncDatabase = async () => {
         await sequelize.authenticate();
         console.log('Connection has been established successfully.');
 
-        // Use alter now that the schema has been created
-        await sequelize.sync({ alter: true });
-        console.log('All models were synchronized successfully.');
+        // Environment-based sync strategy:
+        // - Production: Safe mode (no schema changes)
+        // - Development: Allow model changes to update schema (DEFAULT)
+        const nodeEnv = process.env.NODE_ENV || 'development';
+        const isProduction = nodeEnv === 'production';
+        const syncOptions = isProduction
+            ? { force: false, alter: false }  // Safe for production - no schema changes
+            : { force: false, alter: true };  // Development (default) - apply model changes to schema
+
+        await sequelize.sync(syncOptions);
+        console.log(`Models synchronized in ${nodeEnv} mode`);
         
         // Store models globally for use in routes
         global.models = models;
