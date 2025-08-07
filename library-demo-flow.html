@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Library App Demo Flow – Fabric + GitHub Copilot</title>
+</head>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 2rem; background: #f8f9fa; }
+    h1, h2 { color: #333; }
+    .step { background: white; border-left: 6px solid #4f46e5; padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    pre { background: #282c34; color: #f8f8f2; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+    .voiceover { font-style: italic; margin: 0.5rem 0 1rem; color: #555; }
+    .copy-btn {
+      margin-top: 0.5rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      float: right;
+    }
+  </style>
+  <script>
+    function copyText(preId) {
+      const text = document.getElementById(preId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.opacity = '1';
+        setTimeout(() => {
+          toast.style.opacity = '0';
+        }, 2000);
+      });
+    }
+  </script>
+</head>
+</head>
+<body>
+  <h1>📚 Library App Demo – MSSQL for VS Code + SQL database in Fabric + GitHub Copilot</h1>
+  <h2>🎬 Intro</h2>
+  <p>Hi! I’m Carlos Robles, Principal Product Manager on the SQL Developer Experiences team. In this video, I’ll walk you through version 1.32 of the MSSQL extension for VS Code.</p>
+  <p>This release marks the General Availability of our new UI, introduces the Schema Designer for visual schema editing, and brings GitHub Copilot integration for an AI-assisted SQL development experience — all inside VS Code.</p>
+  <h2>🎬 Scenario</h2>
+  <p>In this scenario, I’m a developer working on a full-stack app that uses Node.js and Sequelize. I’ve been asked to add a new feature to manage magazines in our system and to use SQL Database in Microsoft Fabric as our backend platform. I’m comfortable with ORMs but still new to Sequelize, and only have basic familiarity with T-SQL. I want to use GitHub Copilot and the MSSQL extension to evolve my database schema quickly and efficiently—all from inside VS Code.</p>
+  <p class="voiceover">“Let’s switch over to Visual Studio Code. I’ve already got the MSSQL extension installed and configured, and I’m also signed in to GitHub Copilot with my GitHub account and subscription.”</p>
+
+  <div class="step">
+    <h3>1. App Environment Ready (duration: 30 seconds)</h3>
+    <p class="voiceover">“Before we start, I would like to say that my environment is already set up. All required dependencies are installed and the CLI tools like npm, node, and npx are available.”</p>
+  </div>
+
+  <div class="step">
+    <h3>2. Provision Infrastructure with Terraform (duration: 1 minute)</h3>
+    <p class="voiceover">“I also already created the Terraform scripts to provision my SQL database in Fabric, and gone through initialization, planning, and applying. Now I’ll show the output values — particularly the connection details I’ll use next.”</p>
+    <pre id="step1">terraform -chdir=infrastructure output</pre>
+    <button class="copy-btn" onclick="copyText('step1')">Copy</button>
+  </div>
+
+  <div class="step">
+    <h3>3. Configure Your Environment (duration: 1 minute)</h3>
+    <p class="voiceover">“Let’s grab the server fully qualified domain name, database name, and the standard connection string format directly from the Fabric REST API. We’ll use these in our environment configuration.”</p>
+
+    <pre id="step3b">curl -s https://api.fabric.microsoft.com/v1/workspaces/$WORKSPACE_ID/sqlDatabases \
+  -H "Authorization: Bearer $FABRIC_TOKEN" \
+  | jq -r '.value[0].properties | .serverFqdn, .databaseName, .connectionString'</pre>
+    <button class="copy-btn" onclick="copyText('step3b')">Copy</button>
+  </div>
+
+  <div class="step">
+    <h3>4. Start the backend app (duration: 1 minute)</h3>
+    <p class="voiceover">“When I start the backend, Sequelize creates the tables automatically from my model definitions.”</p>
+    <pre id="step4">cd app/backend
+npm start</pre>
+    <button class="copy-btn" onclick="copyText('step4')">Copy</button>
+  </div>
+
+  <div class="step">
+    <h3>5. Seed the database (duration: 1 minute)</h3>
+    <p class="voiceover">“I’m using Sequelize CLI to seed the database with realistic test data. I will open a new terminal for this.”</p>
+    <pre id="step5">cd app/backend
+npx sequelize-cli db:seed:all</pre>
+    <button class="copy-btn" onclick="copyText('step5')">Copy</button>
+  </div>
+
+  <div class="step">
+    <h3>6. Start the frontend app (duration: 1 minute)</h3>
+    <p class="voiceover">“Now the backend and frontend are up. I can load the UI in the browser.”</p>
+    <pre id="step6">
+cd app/frontend/library-frontend
+npm start</pre>
+    <button class="copy-btn" onclick="copyText('step6')">Copy</button>
+  </div>
+
+  <div class="step">
+    <h3>7. Open the app in VS Code’s browser preview (duration: 30 seconds)</h3>
+    <p class="voiceover">“Now that both services are running, I’ll preview the app using VS Code’s simple browser. The backend is on port 3000 and the frontend is on port 3001.”</p>
+
+    <div style="margin-bottom: 1rem;">
+      <strong>Backend:</strong>
+      <pre id="step6b">http://localhost:3000</pre>
+      <button class="copy-btn" onclick="copyText('step6b')">Copy</button>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <strong>Frontend:</strong>
+      <pre id="step6c">http://localhost:3001</pre>
+      <button class="copy-btn" onclick="copyText('step6c')">Copy</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>8. Connect to Fabric SQL with MSSQL Extension (duration: 1 minute)</h3>
+    <p class="voiceover">“Now let’s take a look at the database in the Fabric portal. Notice there’s an ‘Open in VS Code’ button that launches the MSSQL extension directly from here.”</p>
+    <p>📌 Show: Connection dialog, and Object Explorer (OE) super brief.</p>
+  </div>
+
+  <div class="step">
+    <h3>9. Switch to GitHub Copilot Scenario (duration: 8–10 minutes, GitHub Copilot flow)</h3>
+    <p class="voiceover">“Now I want to explore and extend the schema using GitHub Copilot. I’ve built a guided flow to show how that works.”</p>
+    <pre id="step8"># Open the GitHub Copilot demo HTML in browser:
+open github-copilot-demo.html</pre>
+    <button class="copy-btn" onclick="copyText('step8')">Copy</button>
+    <p>🧠 From here, follow the prompts interactively. Begin at: "List all the tables in my database."</p>
+  </div>
+
+  <div class="step">
+    <h3>10. Wrap Up (duration: 30 seconds)</h3>
+    <p class="voiceover">“In just a few minutes, I went from infra provisioning to data modeling to schema exploration—all in VS Code using GitHub Copilot and the MSSQL extension.”</p>
+  </div>
+</body>
+  <div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #323232;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 1000;
+  ">
+  📋 Copied to clipboard!
+  </div>
+</html>

@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"sqldatabase","Source":"./sqldatabase.tf","Dir":"sqldatabase.tf"},{"Key":"workspace","Source":"./workspace.tf","Dir":"workspace.tf"}]}
