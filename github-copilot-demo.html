@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Copilot Demo Prompts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            padding: 2rem;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 6px solid #4f46e5;
+        }
+        pre {
+            background-color: #282c34;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        .copy-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<style>
+    .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 2rem;
+        background: #4f46e5;
+        color: white;
+        padding: 0.4rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    body.dark {
+        background-color: #1e1e1e;
+        color: #f0f0f0;
+    }
+
+    body.dark .card {
+        background-color: #2e2e2e;
+        border-left-color: #90cdf4;
+    }
+
+    body.dark h1, body.dark h2, body.dark h3 {
+        color: #ffffff;
+    }
+
+    body.dark .copy-btn {
+        background-color: #90cdf4;
+        color: black;
+    }
+
+    body.dark pre {
+        background-color: #111;
+        color: #eee;
+    }
+
+    body.dark #toast {
+        background-color: #555;
+    }
+</style>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+    }
+</script>
+
+<h1>GitHub Copilot SQL + Sequelize Demo Prompts</h1>
+
+<h2>🎬 Scenario Introduction</h2>
+<p>I was asked to implement a new feature in an existing Library management app built with Node.js and React. The app runs inside Dev Containers, which makes it quick to launch.</p>
+<p>To begin, I explored the Express API, confirmed it's working with a call to <code>GET http://localhost:3000/authors</code>, and noted that the backend uses both raw SQL (T-SQL) and Sequelize ORM models for database operations.</p>
+<p>As a developer, I’m comfortable working with ORMs — in past projects, I used Prisma, but this is my first time working with Sequelize. GitHub Copilot helps me ramp up faster by interpreting my SQL schema and suggesting Sequelize model code that matches the project’s conventions.</p>
+<p>This demo walks through how GitHub Copilot can help me understand, extend, and reverse engineer the database schema — using natural prompts inside Visual Studio Code to work with both SQL directly and through Sequelize models.</p>
+
+    <div class="card">
+        <h3>🔹 1. List all existing tables</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code1">List all the tables in my database.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 2. Explore a specific table</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code2">List all the columns and data types in the authors table.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 3. Explore a join table you noticed in OE</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code3">I noticed there’s a table called books_authors. Can you explain what it does and how it connects the books and authors tables?</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 4. Create a new table from sample data</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code4">Create a new empty table called magazines based on the following JSON, make sure to follow T-SQL best practices:
+{
+  "id": 1,
+  "title": "Tech Monthly",
+  "issue": 42,
+  "year": 2023
+}</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 5. Add a relationship to Authors</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code5">Add a many-to-many relationship between this new magazines table and the existing authors table.
+Ensure that the foreign key columns align with the current database schema for both tables, using the correct primary key columns as defined in the existing structure.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 6. Generate science-themed test data</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code6">Generate sample INSERT statements for the magazines table.
+- Each magazine should be themed around science or technology (e.g., astronomy, physics, biology, robotics). Include at least 5 magazines with creative titles, different issues, and years.
+- Make sure the INSERT statements follow typical SQL conventions, leaving out any auto-generated columns.
+- Then, link each magazine to one or more existing authors in the authors table using the junction table.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 7. Ask what a stored procedure does</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code7">Explain what the stored procedure GetBooksWithAuthors does in simple terms.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 8. Analyze and optimize the procedure</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code8">Analyze the stored procedure GetBooksWithAuthors.  
+- Explain its functionality in simple terms.  
+- Identify any inefficiencies or potential performance bottlenecks.  
+- Provide recommendations for optimizing its execution.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code8')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 9. Reverse engineer the full schema</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code9">Generate the "CREATE TABLE" T-SQL script for all tables in my current database.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code9')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 10. Generate Sequelize model for Magazines</h3>
+        <p><em>🎤 Voiceover:</em> Until now, I’ve been working directly with T-SQL, pushing schema changes to the database. But I’m more comfortable working through an ORM. Since I used Prisma in previous projects, Sequelize is still new to me. That’s where GitHub Copilot helps — it can interpret my schema and generate Sequelize models from it, even though Sequelize doesn’t support reverse engineering out of the box without third-party tools I don’t want to install.</p>
+        <pre id="code10">Using MSSQL, read the existing Library database schema. Then, generate a Sequelize model for the new magazines and magazine_authors tables we just created:
+
+- Create a model/magazine.model.js file using the same structure and conventions as my existing models.
+- Define the model using the existing magazines and magazines_authors tables.
+- Create a magazines_authors.model.js file to handle the many-to-many relationship with authors.
+- Ensure the models follow the same patterns already in use in the project, including associations.
+- Also create a seeder file inside app/backend/seeders that inserts the test data created in step 6 (science-themed magazines).</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code10')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 11. Switch to AdventureWorksLT2022</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code11">List all the tables in my database.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code11')">Copy</button>
+    </div>
+    
+    <div class="card">
+        <h3>🔹 12. Prove that chat context resets</h3>
+        <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
+        <pre id="code12">Explain what the stored procedure GetBooksWithAuthors does.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code12')">Copy</button>
+    </div>
+    
+
+
+    <div class="card">
+        <h3>🔹 13. Scaffold a full-stack serverless app (Azure Functions + Blazor)</h3>
+        <p><em>🎤 Voiceover:</em> This is the wow moment — Copilot scaffolds an entire app using the schema.</p>
+        <pre id="code13">Generate a full-stack app using Azure Functions (C#) with SQL Bindings and a Blazor WebAssembly frontend based on the SalesLT.Customer table in my database.
+
+For the backend:
+- Use Azure Functions (C#) with HTTP triggers and SQL input/output bindings.
+- Create the following endpoints:
+  - GET /api/customers
+  - GET /api/customers/{id}
+  - POST /api/customers
+  - PUT /api/customers/{id}
+  - DELETE /api/customers/{id}
+- Use dependency injection for logging and configuration.
+- Include a local.settings.json file with a connection string and environment variables.
+- Add instructions to run the backend locally using Azure Functions Core Tools.
+
+For the frontend (optional):
+- Create a Blazor WebAssembly app that consumes the API.
+- Display a table with customer data and a form to add new customers.
+- Use HttpClient for API calls and two-way data binding in forms.
+- Style the app with Bootstrap or native Blazor components.
+- Include setup instructions for running both the backend and frontend locally, using .env or local.settings.json for configuration.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code13')">Copy</button>
+    </div>
+
+<h2>🎯 Closing Statement</h2>
+<p>This demo was designed to give you a practical, developer-friendly tour of how GitHub Copilot and the MSSQL extension can help you explore, understand, and extend your database — whether you're working with raw SQL or Sequelize.</p>
+<p>But honestly, this is just the beginning. I intentionally kept it light — if you sign up for the private preview, you’ll get documentation, test scenarios, and the freedom to explore your own workflows.</p>
+<p><strong>We’d love your feedback — and we can’t wait to see what you build.</strong></p>
+
+<script>
+function copyToClipboard(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2000);
+    
+    });
+}
+</script>
+
+<div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #323232;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 1000;
+">
+📋 Copied to clipboard!
+</div>
+
+</body>
+</html>
