@@ -126,12 +126,13 @@
     <div class="card">
         <h3>🔹 4. Create a new table from sample data</h3>
         <p><em>🎤 Voiceover:</em> Copilot helps guide this step of the workflow.</p>
-        <pre id="code4">Create a new empty table called magazines based on the following JSON, make sure to follow T-SQL best practices:
+        <pre id="code4">Create a new empty SQL table called magazines that exactly matches the structure and data types of the following JSON object. Use clean T-SQL best practices for naming and data types:
 {
   "id": 1,
   "title": "Tech Monthly",
-  "issue": 42,
-  "year": 2023
+  "issue": 1,
+  "year": 2025,
+  "category": "Science"
 }</pre>
         <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
     </div>
