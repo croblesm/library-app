@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Simple book icon optimized for small sizes -->
+  <rect x="6" y="8" width="20" height="16" rx="1" fill="#007aff" stroke="#ffffff" stroke-width="1"/>
+  
+  <!-- Book spine -->
+  <rect x="6" y="8" width="3" height="16" rx="1" fill="#0056cc"/>
+  
+  <!-- Pages effect -->
+  <line x1="11" y1="8" x2="11" y2="24" stroke="#ffffff" stroke-width="0.5" opacity="0.8"/>
+  <line x1="13" y1="10" x2="24" y2="10" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+  <line x1="13" y1="12" x2="22" y2="12" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+  <line x1="13" y1="14" x2="23" y2="14" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+  
+  <!-- Simple bookmark -->
+  <polygon points="20,8 24,8 22,11" fill="#ff6b35"/>
+</svg>
