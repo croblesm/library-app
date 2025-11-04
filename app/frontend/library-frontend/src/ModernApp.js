@@ -1,124 +1,335 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import './ModernApp.css';
 
 // API Base URL
 const API_BASE = 'http://localhost:3000';
 
-// Components
-function Sidebar() {
-  const location = useLocation();
-  
-  const navItems = [
-    { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/authors', label: 'Authors', icon: '👥' },
-    { path: '/books', label: 'Books', icon: '📚' },
-  ];
-
-  return (
-    <div className="sidebar">
-      <div className="sidebar-logo">
-        <h1>Library App</h1>
-      </div>
-      <nav>
-        <ul className="sidebar-nav">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <Link 
-                to={item.path} 
-                className={location.pathname === item.path ? 'active' : ''}
-              >
-                <span className="icon">{item.icon}</span>
-                {item.label}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <a href="#profile">
-              <span className="icon">👤</span>
-              Profile
-            </a>
-          </li>
-          <li>
-            <a href="#logout">
-              <span className="icon">🚪</span>
-              Logout
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  );
-}
-
+// Modern Header Component
 function Header({ searchTerm, onSearchChange }) {
   return (
-    <div className="header">
-      <div className="search-container">
+    <header className="modern-header">
+      <div className="header-content">
+        <div className="logo-section">
+          <Link to="/" className="logo">
+            📚 My Book Library
+          </Link>
+        </div>
+        
+        <nav className="main-navigation">
+          <Link to="/books" className="nav-link">Books</Link>
+          <Link to="/authors" className="nav-link">Authors</Link>
+        </nav>
+
+        <div className="header-actions">
+          <button className="auth-button sign-up">Sign Up</button>
+          <button className="auth-button sign-in">Sign In</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// Filter Sidebar Component
+function FilterSidebar({ filters, onFilterChange, books }) {
+  const currentYear = new Date().getFullYear();
+  const allGenres = [...new Set(books.map(book => book.category).filter(Boolean))];
+  const minPages = Math.min(...books.map(book => parseInt(book.pages) || 0));
+  const maxPages = Math.max(...books.map(book => parseInt(book.pages) || 1000));
+
+  return (
+    <div className="filter-sidebar">
+      <div className="search-section">
         <input
           type="text"
-          placeholder="Enter Book Name"
-          className="search-input"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search books..."
+          className="search-input-modern"
+          value={filters.search}
+          onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
         />
       </div>
-      <div className="header-actions">
-        <button className="btn btn-primary">Search</button>
+
+      {/* Publication Year Filter */}
+      <div className="filter-group">
+        <label className="filter-label">Publication Year</label>
+        <div className="range-slider">
+          <input
+            type="range"
+            min="1950"
+            max={currentYear}
+            value={filters.yearMin}
+            onChange={(e) => onFilterChange({ ...filters, yearMin: parseInt(e.target.value) })}
+            className="slider"
+          />
+          <input
+            type="range"
+            min="1950"
+            max={currentYear}
+            value={filters.yearMax}
+            onChange={(e) => onFilterChange({ ...filters, yearMax: parseInt(e.target.value) })}
+            className="slider"
+          />
+          <div className="range-values">
+            <span>{filters.yearMin}</span>
+            <span>{filters.yearMax}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Number of Pages Filter */}
+      <div className="filter-group">
+        <label className="filter-label">Number of Pages</label>
+        <div className="range-slider">
+          <input
+            type="range"
+            min={minPages}
+            max={maxPages}
+            value={filters.pagesMin}
+            onChange={(e) => onFilterChange({ ...filters, pagesMin: parseInt(e.target.value) })}
+            className="slider"
+          />
+          <input
+            type="range"
+            min={minPages}
+            max={maxPages}
+            value={filters.pagesMax}
+            onChange={(e) => onFilterChange({ ...filters, pagesMax: parseInt(e.target.value) })}
+            className="slider"
+          />
+          <div className="range-values">
+            <span>{filters.pagesMin}</span>
+            <span>{filters.pagesMax}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Genre Checkboxes */}
+      <div className="filter-group">
+        <label className="filter-label">Book Lists</label>
+        <div className="checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={filters.genres.includes('Popular')}
+              onChange={(e) => {
+                const newGenres = e.target.checked 
+                  ? [...filters.genres, 'Popular']
+                  : filters.genres.filter(g => g !== 'Popular');
+                onFilterChange({ ...filters, genres: newGenres });
+              }}
+            />
+            Popular
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={filters.genres.includes('Classics')}
+              onChange={(e) => {
+                const newGenres = e.target.checked 
+                  ? [...filters.genres, 'Classics']
+                  : filters.genres.filter(g => g !== 'Classics');
+                onFilterChange({ ...filters, genres: newGenres });
+              }}
+            />
+            Classics
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={filters.genres.includes('Sci-Fi & Fantasy')}
+              onChange={(e) => {
+                const newGenres = e.target.checked 
+                  ? [...filters.genres, 'Sci-Fi & Fantasy']
+                  : filters.genres.filter(g => g !== 'Sci-Fi & Fantasy');
+                onFilterChange({ ...filters, genres: newGenres });
+              }}
+            />
+            Sci-Fi & Fantasy
+          </label>
+          {allGenres.map(genre => (
+            <label key={genre} className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={filters.genres.includes(genre)}
+                onChange={(e) => {
+                  const newGenres = e.target.checked 
+                    ? [...filters.genres, genre]
+                    : filters.genres.filter(g => g !== genre);
+                  onFilterChange({ ...filters, genres: newGenres });
+                }}
+              />
+              {genre}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <button 
+        className="clear-filters-btn"
+        onClick={() => onFilterChange({
+          search: '',
+          yearMin: 1950,
+          yearMax: currentYear,
+          pagesMin: minPages,
+          pagesMax: maxPages,
+          genres: []
+        })}
+      >
+        Clear all filters
+      </button>
+    </div>
+  );
+}
+
+// Notification Component
+function NotificationPopup({ show, onClose }) {
+  if (!show) return null;
+
+  return (
+    <div className="notification-popup">
+      <button className="notification-close" onClick={onClose}>×</button>
+      <div className="notification-header">
+        <span className="notification-icon">📚</span>
+        <span className="notification-title">Welcome to My Book Library!</span>
+      </div>
+      <div className="notification-message">
+        This is a demo of searching, filtering, and paginating books from a SQL Server database. <a href="https://aka.ms/vscode-mssql" target="_blank" rel="noopener noreferrer" className="notification-link">Try here</a>
       </div>
     </div>
   );
 }
 
-function BookCard({ book }) {
+// Modern Book Card Component
+function ModernBookCard({ book }) {
   return (
-    <div className="book-card">
-      {book.category && <div className="book-category">{book.category}</div>}
-      {book.image_url ? (
-        <img 
-          src={book.image_url} 
-          alt={book.title}
-          className="book-image"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
-          }}
-        />
-      ) : (
-        <div className="book-placeholder">
-          📖
+    <div className="modern-book-card">
+      <div className="book-image-container">
+        {book.image_url ? (
+          <img 
+            src={book.image_url} 
+            alt={book.title}
+            className="book-cover-image"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : (
+          <div className="book-cover-placeholder">
+            <span className="book-icon">📖</span>
+          </div>
+        )}
+        <div className="book-cover-placeholder" style={{display: 'none'}}>
+          <span className="book-icon">📖</span>
         </div>
-      )}
-      <div className="book-placeholder" style={{display: 'none'}}>
-        📖
+        {book.category && <div className="book-genre-tag">{book.category}</div>}
       </div>
-      <div className="book-info">
-        <div className="book-title">{book.title}</div>
-        <div className="book-author">
+      
+      <div className="book-content">
+        <h3 className="book-title-modern">{book.title}</h3>
+        <p className="book-author-modern">
           {book.authors?.map(a => `${a.first_name} ${a.last_name}`).join(', ') || 'Unknown Author'}
-        </div>
-        <div className="book-details">
-          <span>{book.year}</span>
-          <span>{book.pages} pages</span>
+        </p>
+        <div className="book-metadata">
+          <span className="book-year">{book.year}</span>
+          <span className="book-pages">{book.pages} pages</span>
         </div>
       </div>
     </div>
   );
 }
 
-function HomePage({ books, searchTerm }) {
-  const filteredBooks = books.filter(book => 
-    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    book.category?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
+
+function HomePage({ books, filters, onFilterChange }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(24);
+
+  const filteredBooks = books.filter(book => {
+    const matchesSearch = book.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+                         book.category?.toLowerCase().includes(filters.search.toLowerCase()) ||
+                         book.authors?.some(a => 
+                           `${a.first_name} ${a.last_name}`.toLowerCase().includes(filters.search.toLowerCase())
+                         );
+    
+    const matchesYear = (!book.year) || 
+                       (parseInt(book.year) >= filters.yearMin && parseInt(book.year) <= filters.yearMax);
+    
+    const matchesPages = (!book.pages) || 
+                        (parseInt(book.pages) >= filters.pagesMin && parseInt(book.pages) <= filters.pagesMax);
+                        
+    const matchesGenre = filters.genres.length === 0 || 
+                        filters.genres.includes(book.category);
+    
+    return matchesSearch && matchesYear && matchesPages && matchesGenre;
+  });
+
+  const totalPages = Math.ceil(filteredBooks.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentBooks = filteredBooks.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   return (
-    <div className="content">
-      <h1 className="page-title">Explore Books</h1>
-      <div className="books-grid">
-        {filteredBooks.map(book => (
-          <BookCard key={book.id} book={book} />
+    <div className="modern-content">
+      <div className="content-header">
+        <div className="title-section">
+          <h1 className="modern-page-title">Explore Books</h1>
+          <p className="books-count">Showing {startIndex + 1}-{Math.min(endIndex, filteredBooks.length)} of {filteredBooks.length} books</p>
+        </div>
+        <div className="pagination-section">
+          <div className="pagination-info">
+            {filteredBooks.length.toLocaleString()} results ({currentPage} of {totalPages.toLocaleString()})
+          </div>
+          <div className="pagination-controls">
+            <button 
+              className="pagination-btn" 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              ←
+            </button>
+            <button 
+              className="pagination-btn" 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              →
+            </button>
+          </div>
+          <div className="page-size-selector">
+            <span>Show</span>
+            <select 
+              className="page-size-select"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
+            >
+              <option value={12}>12</option>
+              <option value={24}>24</option>
+              <option value={48}>48</option>
+              <option value={96}>96</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      </div>
+      <div className="modern-books-grid">
+        {currentBooks.map(book => (
+          <ModernBookCard key={book.id} book={book} />
         ))}
       </div>
     </div>
@@ -273,13 +484,12 @@ function BooksPage({ books, authors, onRefresh }) {
 
       <div className="books-grid">
         {books.map(book => (
-          <div key={book.id} className="book-card">
-            <BookCard book={book} />
-            <div style={{padding: '10px'}}>
+          <div key={book.id} className="book-management-card">
+            <ModernBookCard book={book} />
+            <div className="book-actions">
               <button 
                 className="btn btn-secondary"
                 onClick={() => handleDelete(book.id)}
-                style={{width: '100%'}}
               >
                 Delete
               </button>
@@ -414,8 +624,16 @@ function AuthorsPage({ authors, onRefresh }) {
 function ModernApp() {
   const [books, setBooks] = useState([]);
   const [authors, setAuthors] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showNotification, setShowNotification] = useState(true);
+  const [filters, setFilters] = useState({
+    search: '',
+    yearMin: 1950,
+    yearMax: new Date().getFullYear(),
+    pagesMin: 1,
+    pagesMax: 1000,
+    genres: []
+  });
 
   const fetchData = async () => {
     try {
@@ -427,6 +645,19 @@ function ModernApp() {
       
       setBooks(booksResponse.data);
       setAuthors(authorsResponse.data);
+      
+      // Update filter ranges based on actual data
+      if (booksResponse.data.length > 0) {
+        const pages = booksResponse.data.map(book => parseInt(book.pages) || 0);
+        const minPages = Math.min(...pages);
+        const maxPages = Math.max(...pages);
+        
+        setFilters(prev => ({
+          ...prev,
+          pagesMin: minPages,
+          pagesMax: maxPages
+        }));
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -439,30 +670,43 @@ function ModernApp() {
   }, []);
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="modern-loading">
+      <div className="loading-spinner"></div>
+      <p>Loading your library...</p>
+    </div>;
   }
 
   return (
     <Router>
-      <div className="app">
-        <Sidebar />
-        <div className="main-content">
-          <Header searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-          <Routes>
-            <Route 
-              path="/" 
-              element={<HomePage books={books} searchTerm={searchTerm} />} 
-            />
-            <Route 
-              path="/books" 
-              element={<BooksPage books={books} authors={authors} onRefresh={fetchData} />} 
-            />
-            <Route 
-              path="/authors" 
-              element={<AuthorsPage authors={authors} onRefresh={fetchData} />} 
-            />
-          </Routes>
+      <div className="modern-app">
+        <Header />
+        <div className="app-body">
+          <FilterSidebar 
+            filters={filters} 
+            onFilterChange={setFilters} 
+            books={books}
+          />
+          <main className="main-content-modern">
+            <Routes>
+              <Route 
+                path="/" 
+                element={<HomePage books={books} filters={filters} onFilterChange={setFilters} />} 
+              />
+              <Route 
+                path="/books" 
+                element={<BooksPage books={books} authors={authors} onRefresh={fetchData} />} 
+              />
+              <Route 
+                path="/authors" 
+                element={<AuthorsPage authors={authors} onRefresh={fetchData} />} 
+              />
+            </Routes>
+          </main>
         </div>
+        <NotificationPopup 
+          show={showNotification} 
+          onClose={() => setShowNotification(false)} 
+        />
       </div>
     </Router>
   );
