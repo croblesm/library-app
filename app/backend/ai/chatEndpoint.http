@@ -3,6 +3,5 @@ POST http://localhost:8000/chat
 content-type: application/json
 
 {
-    "question": "I want to read science fiction about space exploration"
+    "question": "I want to read a book about adventure. Can you recommend some titles?"
 }
-
