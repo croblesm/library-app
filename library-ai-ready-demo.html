@@ -147,7 +147,7 @@
 <div class="card">
     <h3>🔹 Step 3: Ask Copilot to Generate the ALTER TABLE Statement</h3>
     <p class="voiceover">"Next, we'll ask Copilot to help us add a new VECTOR column to store embeddings. This is where SQL Server 2025's new VECTOR data type comes in. I'm using Ollama's nomic-embed-text model, which produces 768-dimensional vectors."</p>
-    <pre id="code2">I want to add semantic search capabilities to the books table. Generate an ALTER TABLE statement that adds a new column called description_embedding with data type VECTOR(768) to store embeddings.</pre>
+    <pre id="code2">Using my Library database from my GitHub Copilot - AI profile. I want to add semantic search capabilities to the books table. Generate an ALTER TABLE statement that adds a new column called description_embedding with data type VECTOR(768) to store embeddings.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
     <p><strong>Expected SQL:</strong></p>
     <pre id="code3">ALTER TABLE books
@@ -247,19 +247,25 @@ FROM books;</pre>
 
 <div class="card">
     <h3>🔹 Step 9: Understanding the Vector Search SQL</h3>
-    <p class="voiceover">"So how does this actually work? Let me show you the SQL query that powers this semantic search. This is the magic of SQL Server 2025's new VECTOR_DISTANCE function."</p>
+    <p class="voiceover">"So how does this actually work? Let me show you the SQL query that powers the vector similarity search. This demonstrates how SQL Server 2025's VECTOR_DISTANCE function compares book embeddings."</p>
     <pre id="code13">-- Vector similarity search query (768-dimensional vectors from Ollama)
+-- This query finds books similar to a reference book by comparing their embeddings
+DECLARE @ReferenceBookId INT = 9; -- "2001: A Space Odyssey"
+
 SELECT TOP 3
-    id,
-    title,
-    category,
-    year,
-    1 - VECTOR_DISTANCE('cosine', description_embedding, @QueryVector) AS SimilarityScore
-FROM books
-WHERE description_embedding IS NOT NULL
-ORDER BY VECTOR_DISTANCE('cosine', description_embedding, @QueryVector) ASC;</pre>
+    b.id,
+    b.title,
+    b.category,
+    b.year,
+    CAST(1 - VECTOR_DISTANCE('cosine', b.description_embedding, 
+         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) AS FLOAT) AS SimilarityScore
+FROM books b
+WHERE b.description_embedding IS NOT NULL
+    AND b.id != @ReferenceBookId
+ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding, 
+         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) ASC;</pre>
     <button class="copy-btn" onclick="copyToClipboard('code13')">Copy</button>
-    <p class="voiceover">"The VECTOR_DISTANCE function calculates the cosine similarity between the user's question embedding and each book's embedding. It's running entirely in SQL Server — no external vector database needed."</p>
+    <p class="voiceover">"The VECTOR_DISTANCE function calculates the cosine similarity between a reference book's embedding and all other books' embeddings. It returns varying similarity scores based on semantic closeness. In our chat service, we generate the embedding from the user's natural language question and use that as the query vector instead. It's running entirely in SQL Server — no external vector database needed."</p>
 </div>
 
 <h2>🎯 What We Accomplished</h2>
