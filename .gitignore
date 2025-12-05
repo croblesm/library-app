@@ -23,6 +23,26 @@
 **/.terraform.lock.hcl
 **/data.fabric_capacity.capacity
 
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/dist/
+**/build/
+**/venv/
+**/env/
+**/.venv/
+**/.env.venv
+**/pip-log.txt
+**/pip-delete-this-directory.txt
+**/.pytest_cache/
+**/.coverage
+**/htmlcov/
+**/*.egg
+**/wheels/
+**/.Python
+**/site-packages/
+
 # Logs
 **/logs/
 **/*.log
