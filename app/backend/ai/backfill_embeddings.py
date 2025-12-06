@@ -81,24 +81,26 @@ def initialize_embedding_model():
 
 def fetch_books(cursor):
     """
-    Query all books from the database.
+    Query all books from the database with author information.
 
     Args:
         cursor: Database cursor for executing queries
 
     Returns:
-        list: List of tuples containing (id, title, category)
+        list: List of tuples containing (id, title, category, year, author_name)
     """
     print("🔄 Fetching books from database...")
 
-    # Query books table for id, title, and category
-    # We'll use title + category as the text to embed since there's no description column
-    # Column names are lowercase to match the Sequelize schema
+    # Query books with author names via the junction table
+    # This allows embedding to include author for author-based searches
     query = """
-        SELECT id, title, category
-        FROM books
-        WHERE title IS NOT NULL AND title != ''
-        ORDER BY id
+        SELECT b.id, b.title, b.category, b.year,
+               CONCAT(a.first_name, ' ', a.last_name) as author_name
+        FROM books b
+        LEFT JOIN books_authors ba ON b.id = ba.book_id
+        LEFT JOIN authors a ON ba.author_id = a.id
+        WHERE b.title IS NOT NULL AND b.title != ''
+        ORDER BY b.id
     """
 
     cursor.execute(query)
@@ -107,25 +109,42 @@ def fetch_books(cursor):
     print(f"✅ Found {len(books)} books to process")
     return books
 
-def generate_embedding(embeddings_model, title, category):
+def generate_embedding(embeddings_model, title, category, year=None, author=None):
     """
     Generate embedding vector for the given book.
 
-    Since the books table doesn't have a description column, we combine
-    the title and category to create meaningful text for embedding.
+    Combines title, author, category, and year to create meaningful text for embedding.
+    This allows semantic search to match on:
+    - Title searches: "Foundation"
+    - Author searches: "Isaac Asimov books"
+    - Category searches: "science fiction"
+    - Era searches: "books from 1950s"
 
     Args:
         embeddings_model: Initialized LangChain embeddings model
         title (str): Book title
         category (str): Book category/genre
+        year (int): Publication year
+        author (str): Author name
 
     Returns:
         list: Embedding vector (list of floats)
     """
-    # Combine title and category for a richer embedding
-    # Example: "Foundation Science Fiction"
-    text = f"{title} {category}" if category else title
-
+    # Build structured text with all available metadata
+    # Example: "Book: Foundation, Author: Isaac Asimov, Category: Science Fiction, Year: 1951"
+    parts = [f"Book: {title}"]
+    
+    if author:
+        parts.append(f"Author: {author}")
+    
+    if category:
+        parts.append(f"Category: {category}")
+    
+    if year:
+        parts.append(f"Year: {year}")
+    
+    text = ", ".join(parts)
+    
     # Use LangChain to generate embedding
     # The embed_query method returns a list of floats representing the vector
     embedding = embeddings_model.embed_query(text)
@@ -191,11 +210,11 @@ def backfill_embeddings():
     processed = 0
     failed = 0
 
-    for book_id, title, category in books:
+    for book_id, title, category, year, author in books:
         try:
-            # Generate embedding for the book (using title + category)
-            print(f"  Processing Book ID {book_id}: {title[:50]}...")
-            embedding = generate_embedding(embeddings_model, title, category)
+            # Generate embedding for the book (using title + author + category + year)
+            print(f"  Processing Book ID {book_id}: {title[:50]} by {author or 'Unknown'}...")
+            embedding = generate_embedding(embeddings_model, title, category, year, author)
 
             # Update the database with the embedding vector
             update_book_embedding(cursor, book_id, embedding)
