@@ -139,7 +139,7 @@
 <div class="card">
     <h3>🔹 Step 2: Ask Copilot to Analyze the Books Table</h3>
     <p class="voiceover">"Now let's use GitHub Copilot to understand the structure of our Books table. Open the Copilot Chat panel and ask it about the schema."</p>
-    <pre id="code1">Describe the books table in the Library database. What columns does it have and what are their data types?</pre>
+    <pre id="code1">Using my GitHub Copilot - AI connection profile, describe the books table in the Library database. What columns does it have and what are their data types?</pre>
     <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
     <p><strong>Expected response:</strong> Copilot will analyze the books table and show you columns like id, title, year, pages, image_url, category (all lowercase, matching the Sequelize schema).</p>
 </div>
@@ -147,7 +147,7 @@
 <div class="card">
     <h3>🔹 Step 3: Ask Copilot to Generate the ALTER TABLE Statement</h3>
     <p class="voiceover">"Next, we'll ask Copilot to help us add a new VECTOR column to store embeddings. This is where SQL Server 2025's new VECTOR data type comes in. I'm using Ollama's nomic-embed-text model, which produces 768-dimensional vectors."</p>
-    <pre id="code2">Using my Library database from my GitHub Copilot - AI profile. I want to add semantic search capabilities to the books table. Generate an ALTER TABLE statement that adds a new column called description_embedding with data type VECTOR(768) to store embeddings.</pre>
+    <pre id="code2">Ok, now I want to add semantic search capabilities to the books table. Generate an ALTER TABLE statement that adds a new column called description_embedding with data type VECTOR(768) to store embeddings.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
     <p><strong>Expected SQL:</strong></p>
     <pre id="code3">ALTER TABLE books

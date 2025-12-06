@@ -13,10 +13,13 @@ import {
   Close as CloseIcon,
   Book as BookIcon,
   SearchOff as SearchOffIcon,
-  PersonOff as PersonOffIcon
+  PersonOff as PersonOffIcon,
+  Chat as ChatIcon,
+  Send as SendIcon
 } from '@mui/icons-material';
 
 const API_BASE = 'http://localhost:3000';
+const CHAT_API_BASE = 'http://localhost:8000';
 
 // Dark theme - True dark mode (almost black background)
 const darkTheme = createTheme({
@@ -481,6 +484,341 @@ function BookCard({ book }) {
   );
 }
 
+function ChatBox() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = React.useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || loading) return;
+
+    const userMessage = inputValue.trim();
+    setInputValue('');
+
+    // Add user message to chat
+    const newMessages = [...messages, { type: 'user', content: userMessage }];
+    setMessages(newMessages);
+    setLoading(true);
+
+    try {
+      // Build conversation history for the API (last 6 messages for context)
+      const conversationHistory = messages.slice(-6).map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+
+      // Call the RAG chat API with conversation history
+      const response = await axios.post(`${CHAT_API_BASE}/chat`, {
+        question: userMessage,
+        conversation_history: conversationHistory
+      });
+
+      // Add AI response to chat
+      setMessages([...newMessages, {
+        type: 'assistant',
+        content: response.data.response,
+        results: response.data.results
+      }]);
+    } catch (error) {
+      console.error('Error calling chat API:', error);
+
+      // Provide user-friendly error message
+      let errorMessage = "I'm having trouble connecting right now. Please try again in a moment.";
+
+      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+        errorMessage = "I'm currently unavailable. The chat service may be offline. Please try again later or contact support if the issue persists.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "I encountered an error while processing your request. Please try rephrasing your question or try again later.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "The chat service is not responding. Please try again later.";
+      }
+
+      setMessages([...newMessages, {
+        type: 'error',
+        content: errorMessage
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  if (!isOpen) {
+    return (
+      <Button
+        onClick={() => setIsOpen(true)}
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          width: 60,
+          height: 60,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+          color: '#000',
+          boxShadow: '0 8px 24px rgba(96, 165, 250, 0.4)',
+          zIndex: 1001,
+          minWidth: 'auto',
+          '&:hover': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 12px 32px rgba(96, 165, 250, 0.5)',
+          },
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
+      >
+        <ChatIcon sx={{ fontSize: '1.8rem' }} />
+      </Button>
+    );
+  }
+
+  return (
+    <Paper
+      sx={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+        width: 400,
+        height: 600,
+        backgroundColor: '#1a1a1a',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+        borderRadius: '12px',
+        zIndex: 1001,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Chat Header */}
+      <Box
+        sx={{
+          p: 2.5,
+          background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+          color: '#000',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <ChatIcon sx={{ fontSize: '1.5rem' }} />
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            Library Assistant
+          </Typography>
+        </Box>
+        <Button
+          onClick={() => setIsOpen(false)}
+          sx={{
+            minWidth: 'auto',
+            width: '32px',
+            height: '32px',
+            padding: 0,
+            color: '#000',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            }
+          }}
+        >
+          <CloseIcon sx={{ fontSize: '1.2rem' }} />
+        </Button>
+      </Box>
+
+      {/* Messages Area */}
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: 'auto',
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          backgroundColor: '#0a0a0a'
+        }}
+      >
+        {messages.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <ChatIcon sx={{ fontSize: '3rem', color: 'rgba(96, 165, 250, 0.3)', mb: 2 }} />
+            <Typography sx={{ color: '#808080', mb: 1 }}>
+              Ask me about books!
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#606060', fontSize: '0.85rem' }}>
+              I can help you find books based on your interests.
+            </Typography>
+          </Box>
+        )}
+
+        {messages.map((message, index) => (
+          <Box
+            key={index}
+            sx={{
+              display: 'flex',
+              justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start'
+            }}
+          >
+            <Paper
+              sx={{
+                p: 1.5,
+                maxWidth: '80%',
+                backgroundColor: message.type === 'user'
+                  ? 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)'
+                  : message.type === 'error'
+                  ? 'rgba(239, 68, 68, 0.1)'
+                  : '#1a1a1a',
+                background: message.type === 'user'
+                  ? 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)'
+                  : 'transparent',
+                border: message.type === 'user'
+                  ? 'none'
+                  : message.type === 'error'
+                  ? '1px solid rgba(239, 68, 68, 0.3)'
+                  : '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                boxShadow: message.type === 'user' ? '0 2px 8px rgba(96, 165, 250, 0.3)' : 'none'
+              }}
+            >
+              <Typography
+                sx={{
+                  color: message.type === 'user' ? '#000' : message.type === 'error' ? '#ef4444' : '#f5f5f5',
+                  fontSize: '0.9rem',
+                  lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word'
+                }}
+              >
+                {message.content}
+              </Typography>
+
+              {/* Display book results if available */}
+              {message.results && message.results.length > 0 && (
+                <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <Typography variant="caption" sx={{ color: '#808080', fontWeight: 600, mb: 1, display: 'block' }}>
+                    Book Recommendations:
+                  </Typography>
+                  {message.results.map((book, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        mt: 1,
+                        p: 1,
+                        backgroundColor: 'rgba(96, 165, 250, 0.05)',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(96, 165, 250, 0.2)'
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#60a5fa' }}>
+                        {book.title}
+                      </Typography>
+                      <Typography sx={{ fontSize: '0.75rem', color: '#808080' }}>
+                        {book.category} • {book.year} • {(book.similarity_score * 100).toFixed(0)}% match
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Paper>
+          </Box>
+        ))}
+
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Paper
+              sx={{
+                p: 1.5,
+                backgroundColor: '#1a1a1a',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px'
+              }}
+            >
+              <Typography sx={{ color: '#808080', fontSize: '0.9rem' }}>
+                Thinking...
+              </Typography>
+            </Paper>
+          </Box>
+        )}
+
+        <div ref={messagesEndRef} />
+      </Box>
+
+      {/* Input Area */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundColor: '#1a1a1a'
+        }}
+      >
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField
+            placeholder="Ask about books..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={loading}
+            multiline
+            maxRows={3}
+            fullWidth
+            size="small"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: '#f5f5f5',
+                backgroundColor: '#0a0a0a',
+                fontSize: '0.9rem',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgba(96, 165, 250, 0.3)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#60a5fa',
+                },
+              },
+            }}
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!inputValue.trim() || loading}
+            sx={{
+              minWidth: 'auto',
+              width: '40px',
+              height: '40px',
+              padding: 0,
+              background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+              color: '#000',
+              borderRadius: '8px',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(96, 165, 250, 0.4)',
+              },
+              '&:disabled': {
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: 'rgba(255, 255, 255, 0.3)',
+              }
+            }}
+          >
+            <SendIcon sx={{ fontSize: '1.2rem' }} />
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
+  );
+}
+
 function HomePage({ books }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ yearRange: [1800, new Date().getFullYear()], pagesRange: [1, 2000], selectedGenres: [] });
@@ -733,7 +1071,7 @@ function HomePage({ books }) {
             sx={{
               position: 'fixed',
               bottom: 24,
-              right: 24,
+              left: 24,
               p: 2.5,
               maxWidth: 350,
               backgroundColor: '#1a1a1a',
@@ -780,6 +1118,8 @@ function HomePage({ books }) {
             </Box>
           </Paper>
         )}
+
+        <ChatBox />
       </Box>
     </Box>
   );
