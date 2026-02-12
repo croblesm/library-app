@@ -4,19 +4,12 @@ A full-stack library management application with AI-powered book recommendations
 
 ## Architecture
 
-```
-+---------------------+      +---------------------+      +----------------------+
-|   React Frontend    | ---> |  Express Backend     | ---> |  SQL Server 2025     |
-|   (port 3001)       |      |  (port 3000)         |      |  VECTOR support      |
-|   MUI + Tailwind    |      |  Sequelize ORM       |      |  books, authors,     |
-+---------------------+      +---------------------+      |  books_authors       |
-         |                                                  +----------------------+
-         |                    +---------------------+              ^
-         +------------------> |  FastAPI AI/RAG     | -------------+
-                              |  (port 8000)        |
-                              |  Ollama LLM +       |
-                              |  Embeddings         |
-                              +---------------------+
+```mermaid
+graph LR
+    A["React Frontend<br/>(port 3001)<br/>MUI + Tailwind"] -->|REST API| B["Express Backend<br/>(port 3000)<br/>Sequelize ORM"]
+    B -->|tedious| C["SQL Server 2025<br/>VECTOR support<br/>books, authors,<br/>books_authors"]
+    A -->|/chat| D["FastAPI AI/RAG<br/>(port 8000)<br/>Ollama LLM +<br/>Embeddings"]
+    D -->|mssql_python| C
 ```
 
 ## Tech Stack
@@ -371,19 +364,32 @@ DB_CONNECTION_STRING=mssql://<your-fabric-server>.msit-database.fabric.microsoft
 
 ## Database Schema
 
-```
-+------------------+       +-------------------+       +------------------+
-|     books        |       |  books_authors    |       |    authors       |
-+------------------+       +-------------------+       +------------------+
-| id (PK)          |<------| book_id (FK)      |       | id (PK)          |
-| title            |       | author_id (FK)    |------>| first_name       |
-| year             |       +-------------------+       | middle_name      |
-| pages            |       (composite PK,              | last_name        |
-| image_url        |        cascade delete)            +------------------+
-| category         |
-| description_embedding |
-|   VECTOR(768)    |
-+------------------+
+```mermaid
+erDiagram
+    books ||--o{ books_authors : ""
+    authors ||--o{ books_authors : ""
+
+    books {
+        int id PK
+        nvarchar title
+        int year
+        int pages
+        nvarchar image_url
+        nvarchar category
+        vector768 description_embedding
+    }
+
+    authors {
+        int id PK
+        nvarchar first_name
+        nvarchar middle_name
+        nvarchar last_name
+    }
+
+    books_authors {
+        int book_id FK
+        int author_id FK
+    }
 ```
 
 **Seed data:** 5 authors (Asimov, Clarke, Wells, Verne, Dick) and 24 books across Science Fiction, Classic Science Fiction, Adventure, Dystopian Science Fiction, and Alternate History.
