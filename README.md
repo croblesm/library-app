@@ -32,6 +32,9 @@ graph LR
 
 ## Prerequisites
 
+- **VS Code** with the following extensions:
+  - [MSSQL extension](https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql) -- for creating SQL Server containers and querying the database
+  - [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot) -- AI-powered code completion
 - **Node.js** >= 18 and npm ([download](https://nodejs.org/))
 - **Python** >= 3.8 and pip ([download](https://www.python.org/))
 - **Docker** (recommended for running SQL Server locally) ([download](https://www.docker.com/))
@@ -43,6 +46,9 @@ For AI features:
 Optional:
 - **Terraform** >= 1.5.7 (for Microsoft Fabric infrastructure)
 - **Azure CLI** (for Entra ID authentication with Fabric)
+
+> [!TIP]
+> Use the **Open in GitHub Codespaces** or **Open in Dev Container** buttons above to get a pre-configured environment with all prerequisites installed.
 
 ---
 
@@ -84,7 +90,13 @@ library-app/
 │           │   └── index.js            # Entry point
 │           └── package.json
 ├── infrastructure/                     # Terraform files for Microsoft Fabric
-├── CLAUDE.md                           # Project context for Claude Code
+├── .devcontainer/
+│   └── devcontainer.json               # Dev container / Codespaces configuration
+├── .github/
+│   └── copilot-instructions.md         # GitHub Copilot custom instructions
+├── AGENTS.md                           # Cross-platform AI agent instructions
+├── CLAUDE.md                           # Claude Code project context
+├── .cursorrules                        # Cursor AI instructions
 └── README.md                           # This file
 ```
 
