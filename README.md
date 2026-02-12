@@ -1,3 +1,6 @@
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/croblesm/library-app)
+[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/croblesm/library-app)
+
 # Library App
 
 A full-stack library management application with AI-powered book recommendations, built to demonstrate **SQL Server 2025's native VECTOR data type**, Node.js, React, and GitHub Copilot integration with the MSSQL extension.

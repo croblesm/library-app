@@ -1,0 +1,44 @@
+{
+    "name": "Library App",
+
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:22-bookworm",
+
+    "features": {
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.12"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/prulloac/devcontainer-features/ollama:1": {}
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-mssql.mssql",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-python.python",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+
+    "forwardPorts": [3000, 3001, 8000, 1433, 11434],
+    "portsAttributes": {
+        "3000":  { "label": "Express Backend",    "onAutoForward": "notify" },
+        "3001":  { "label": "React Frontend",     "onAutoForward": "openBrowser" },
+        "8000":  { "label": "FastAPI AI Service",  "onAutoForward": "notify" },
+        "1433":  { "label": "SQL Server",          "onAutoForward": "silent" },
+        "11434": { "label": "Ollama",              "onAutoForward": "silent" }
+    },
+
+    "postCreateCommand": "cd app/backend && npm install && cd ../frontend/library-frontend && npm install && cd ../../backend/ai && pip install -r requirements.txt",
+
+    "hostRequirements": {
+        "cpus": 4,
+        "memory": "8gb",
+        "storage": "32gb"
+    }
+}
