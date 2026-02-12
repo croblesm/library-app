@@ -1,0 +1,20 @@
+# Python dependencies for the Library AI/RAG service
+# Install: pip install -r requirements.txt
+
+# Database driver - Microsoft SQL Server native Python driver
+mssql-python>=1.0.0
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# LangChain - LLM/embedding abstraction framework
+langchain>=0.2.0
+langchain-ollama>=0.1.0
+langchain-community>=0.2.0
+
+# Web framework
+fastapi>=0.100.0
+uvicorn>=0.20.0
+
+# Data validation (required by FastAPI)
+pydantic>=2.0.0

@@ -23,5 +23,8 @@
     "mssql": "^11.0.1",
     "sequelize": "^6.37.7",
     "tedious": "^18.6.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.5"
   }
 }

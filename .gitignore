@@ -56,6 +56,9 @@
 **/.DS_Store
 .claude/
 
+# Demo presenter notes (private)
+.demo/
+
 # Miscellaneous
 **/*.swp
 **/*.swo

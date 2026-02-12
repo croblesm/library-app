@@ -19,7 +19,7 @@ import os
 import sys
 from dotenv import load_dotenv
 import mssql_python as mssql
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings
 
 # Load environment variables from .env file
 # This reads the MSSQL_CONNECTION_STRING variable for database connectivity
