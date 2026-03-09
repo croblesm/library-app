@@ -131,12 +131,12 @@
 </div>
 
 <div class="card">
-    <h3>Step 3: Use Copilot to Create the Magazines Table</h3>
-    <p class="voiceover">"Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask Copilot to create the table from that selection."</p>
+    <h3>Step 3: Use GitHub Copilot to Create the Magazines Table</h3>
+    <p class="voiceover">"Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask GitHub Copilot to create the table from that selection."</p>
     <p><em>Show: Open <code>ModernApp.js</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
     <pre id="code1">using the selected JSON structure, create a new table called Magazines</pre>
     <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
-    <p class="voiceover">"This is the key moment -- Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
+    <p class="voiceover">"This is the key moment -- GitHub Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
 </div>
 
 <div class="card">
@@ -153,16 +153,16 @@
 
 <div class="card">
     <h3>Step 6: Add a Many-to-Many Relationship with Authors</h3>
-    <p class="voiceover">"Magazines can also have authors, just like books do. Let me ask Copilot to create the junction table for this many-to-many relationship."</p>
+    <p class="voiceover">"Magazines can also have authors, just like books do. Let me ask GitHub Copilot to create the junction table for this many-to-many relationship."</p>
     <pre id="code2">Add a many-to-many relationship between this new magazines table and the existing authors table.
 Ensure that the foreign key columns align with the current database schema for both tables, using the correct primary key columns as defined in the existing structure.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
-    <p class="voiceover">"Copilot creates a magazines_authors junction table with the correct foreign keys pointing to both tables. Let me review and publish this change too."</p>
+    <p class="voiceover">"GitHub Copilot creates a magazines_authors junction table with the correct foreign keys pointing to both tables. Let me review and publish this change too."</p>
 </div>
 
 <div class="card">
     <h3>Step 7: Generate Science-Themed Test Data</h3>
-    <p class="voiceover">"Now I need some test data. Let me ask Copilot to generate realistic INSERT statements for our new table."</p>
+    <p class="voiceover">"Now I need some test data. Let me ask GitHub Copilot to generate realistic INSERT statements for our new table."</p>
     <pre id="code3">Generate sample INSERT statements for the magazines table.
 - Each magazine should be themed around science or technology (e.g., astronomy, physics, biology, robotics).
 - Include at least 5 magazines with creative titles, different issues, and years.
@@ -211,13 +211,13 @@ useEffect(() => {
         <li>Used <strong>Schema Designer</strong> to visually create the magazines table</li>
         <li>Used <strong>GitHub Copilot</strong> integrated in Schema Designer to generate table structures from JSON</li>
         <li>Added a <strong>many-to-many relationship</strong> with the existing authors table</li>
-        <li>Generated <strong>science-themed test data</strong> with Copilot</li>
+        <li>Generated <strong>science-themed test data</strong> with GitHub Copilot</li>
         <li>Created a <strong>REST API in seconds</strong> using Data API Builder</li>
         <li>Wired the <strong>React frontend</strong> to the live API endpoint</li>
     </ul>
     <p><strong>Key takeaways:</strong></p>
     <ul>
-        <li>Schema Designer + Copilot lets you design tables visually with AI assistance</li>
+        <li>Schema Designer + GitHub Copilot lets you design tables visually with AI assistance</li>
         <li>You stay in control -- review and approve every change before publishing</li>
         <li>Data API Builder eliminates boilerplate API code for standard CRUD operations</li>
         <li>The entire workflow happens inside VS Code -- no context switching</li>
@@ -225,7 +225,7 @@ useEffect(() => {
 </div>
 
 <h2>Closing Statement</h2>
-<p class="voiceover">"In just a few minutes, we went from hardcoded data to a fully connected stack -- database table, relationships, test data, REST API, and frontend -- all without leaving VS Code. The Schema Designer with Copilot integration and Data API Builder make database development faster and more visual than ever."</p>
+<p class="voiceover">"In just a few minutes, we went from hardcoded data to a fully connected stack -- database table, relationships, test data, REST API, and frontend -- all without leaving VS Code. The Schema Designer with GitHub Copilot integration and Data API Builder make database development faster and more visual than ever."</p>
 
 <p><strong>We'd love your feedback -- and we can't wait to see what you build.</strong></p>
 

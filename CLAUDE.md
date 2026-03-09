@@ -52,7 +52,7 @@ docs/                         Documentation
     github-copilot-demo.html  GitHub Copilot + MSSQL extension demo
     library-ai-ready-demo.html AI-ready demo (VECTOR + RAG)
     library-demo-flow.html    End-to-end demo orchestration
-    schema-designer-demo.html Schema Designer + Copilot demo
+    schema-designer-demo.html Schema Designer + GitHub Copilot demo
 infrastructure/               Terraform for Microsoft Fabric provisioning
 ```
 

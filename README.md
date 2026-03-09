@@ -425,7 +425,7 @@ The [PRD](docs/PRD.md) defines the full scope of the application — data model,
 
 ### GitHub Copilot Custom Instructions
 
-The project includes a [GitHub Copilot custom instructions file](.github/copilot-instructions.md) that teaches Copilot about the project's conventions: SQL Server only, Sequelize patterns, lowercase snake_case naming, `global.models` access, and more. This file is automatically loaded by GitHub Copilot in VS Code whenever you work in this repository, helping it generate code that follows the project's rules without you having to repeat them.
+The project includes a [GitHub Copilot custom instructions file](.github/copilot-instructions.md) that teaches GitHub Copilot about the project's conventions: SQL Server only, Sequelize patterns, lowercase snake_case naming, `global.models` access, and more. This file is automatically loaded by GitHub Copilot in VS Code whenever you work in this repository, helping it generate code that follows the project's rules without you having to repeat them.
 
 > [!TIP]
 > Additional AI agent instruction files are included for other tools: [AGENTS.md](AGENTS.md) (Codex, Cline, Windsurf, Gemini CLI, Aider), [CLAUDE.md](CLAUDE.md) (Claude Code), and [.cursorrules](.cursorrules) (Cursor).
@@ -436,7 +436,7 @@ Interactive HTML guides are available in [`docs/demos/`](docs/demos/) for reprod
 
 | Demo | File | Description |
 |------|------|-------------|
-| GitHub Copilot + MSSQL | [`github-copilot-demo.html`](docs/demos/github-copilot-demo.html) | Using Copilot with the MSSQL extension for database development |
+| GitHub Copilot + MSSQL | [`github-copilot-demo.html`](docs/demos/github-copilot-demo.html) | Using GitHub Copilot with the MSSQL extension for database development |
 | AI-Ready with SQL Server 2025 | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Adding VECTOR columns, embeddings, and semantic search |
 | Schema Designer | [`schema-designer-demo.html`](docs/demos/schema-designer-demo.html) | Visual schema design with the MSSQL extension |
 | End-to-End Flow | [`library-demo-flow.html`](docs/demos/library-demo-flow.html) | Full demo orchestration from setup to AI search |

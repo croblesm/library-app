@@ -124,7 +124,7 @@
     <li>Demonstrating semantic search using SQL Server 2025's native vector similarity functions</li>
 </ul>
 
-<p class="voiceover">"For this demo, I've already set up the environment — Python packages are installed, the .env file is configured with my SQL Server connection string, Ollama is running with the nomic-embed-text model, and the code is ready. Now let's focus on making the database AI-ready using Copilot."</p>
+<p class="voiceover">"For this demo, I've already set up the environment — Python packages are installed, the .env file is configured with my SQL Server connection string, Ollama is running with the nomic-embed-text model, and the code is ready. Now let's focus on making the database AI-ready using GitHub Copilot."</p>
 
 <p><strong>Note:</strong> The books table uses lowercase column names (Sequelize conventions) and doesn't have a description column, so embeddings are generated from title + category.</p>
 
@@ -137,16 +137,16 @@
 </div>
 
 <div class="card">
-    <h3>🔹 Step 2: Ask Copilot to Analyze the Books Table</h3>
+    <h3>🔹 Step 2: Ask GitHub Copilot to Analyze the Books Table</h3>
     <p class="voiceover">"Now let's use GitHub Copilot to understand the structure of our Books table. Open the Copilot Chat panel and ask it about the schema."</p>
     <pre id="code1">Using my GitHub Copilot - AI connection profile, describe the books table in the Library database. What columns does it have and what are their data types?</pre>
     <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
-    <p><strong>Expected response:</strong> Copilot will analyze the books table and show you columns like id, title, year, pages, image_url, category (all lowercase, matching the Sequelize schema).</p>
+    <p><strong>Expected response:</strong> GitHub Copilot will analyze the books table and show you columns like id, title, year, pages, image_url, category (all lowercase, matching the Sequelize schema).</p>
 </div>
 
 <div class="card">
-    <h3>🔹 Step 3: Ask Copilot to Generate the ALTER TABLE Statement</h3>
-    <p class="voiceover">"Next, we'll ask Copilot to help us add a new VECTOR column to store embeddings. This is where SQL Server 2025's new VECTOR data type comes in. I'm using Ollama's nomic-embed-text model, which produces 768-dimensional vectors."</p>
+    <h3>🔹 Step 3: Ask GitHub Copilot to Generate the ALTER TABLE Statement</h3>
+    <p class="voiceover">"Next, we'll ask GitHub Copilot to help us add a new VECTOR column to store embeddings. This is where SQL Server 2025's new VECTOR data type comes in. I'm using Ollama's nomic-embed-text model, which produces 768-dimensional vectors."</p>
     <pre id="code2">Ok, now I want to add semantic search capabilities to the books table. Generate the appropriate statement that adds a new column called description_embedding as a vector data type to store embeddings.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
     <p><strong>Expected SQL:</strong></p>
@@ -156,8 +156,8 @@ ADD description_embedding VECTOR(768) NULL;</pre>
 </div>
 
 <div class="card">
-    <h3>🔹 Step 4: Ask Copilot to Create a Vector Index</h3>
-    <p class="voiceover">"For optimal performance with vector similarity searches, we should create an index on the VECTOR column. Let's ask Copilot to generate that statement too."</p>
+    <h3>🔹 Step 4: Ask GitHub Copilot to Create a Vector Index</h3>
+    <p class="voiceover">"For optimal performance with vector similarity searches, we should create an index on the VECTOR column. Let's ask GitHub Copilot to generate that statement too."</p>
     <pre id="code4">Create a vector index on the description_embedding column in the books table to optimize similarity search queries.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
     <p><strong>Expected SQL:</strong></p>
@@ -177,10 +177,10 @@ ON books(description_embedding);</pre>
 
 <div class="card">
     <h3>🔹 Step 6: Verify the Embeddings in the Database</h3>
-    <p class="voiceover">"Great! Now let's verify in VS Code that the embeddings were successfully created. I'll use Copilot to help me write a quick query to check."</p>
+    <p class="voiceover">"Great! Now let's verify in VS Code that the embeddings were successfully created. I'll use GitHub Copilot to help me write a quick query to check."</p>
     <pre id="code7">Show me the first 5 books and whether they have embeddings in the description_embedding column.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button>
-    <p><strong>Expected SQL that Copilot will generate:</strong></p>
+    <p><strong>Expected SQL that GitHub Copilot will generate:</strong></p>
     <pre id="code8">SELECT TOP 5 id, title,
        CASE WHEN description_embedding IS NOT NULL
             THEN 'Embedding exists'
@@ -313,7 +313,7 @@ ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding,
         <li>📖 <strong>Setup Instructions:</strong> See <a href="README-ai-ready-demo.md">README-ai-ready-demo.md</a> for complete environment setup, Python dependencies, and step-by-step instructions</li>
         <li>🐍 <strong>Python Scripts:</strong> Check <code>app/backend/ai/</code> for the backfill and chat service code</li>
         <li>💡 <strong>SQL Server 2025:</strong> Learn more about VECTOR data types and vector similarity search</li>
-        <li>🤖 <strong>GitHub Copilot:</strong> Sign up for access to Copilot with the MSSQL extension</li>
+        <li>🤖 <strong>GitHub Copilot:</strong> Sign up for access to GitHub Copilot with the MSSQL extension</li>
     </ul>
 </div>
 
