@@ -507,7 +507,7 @@ The Node.js backend and Python AI service use **different** `.env` formats:
 ### CORS Errors
 
 - The Express backend allows all origins via the `cors()` middleware.
-- The Python AI service allows requests from `http://localhost:3001` and `http://127.0.0.1:3001`.
+- The Python AI service allows requests from `http://localhost:3001` and `http://127.0.0.1:3001` by default. Override with the `CORS_ORIGINS` environment variable in `app/backend/ai/.env`.
 
 ### Vector Search Returns No Results
 
