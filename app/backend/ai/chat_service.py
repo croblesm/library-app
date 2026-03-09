@@ -26,11 +26,13 @@ Prerequisites:
 
 import os
 import re
+import logging
+from contextlib import asynccontextmanager
 from typing import List, Dict, Optional, Tuple
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import mssql_python as mssql
 from langchain_ollama import OllamaEmbeddings, OllamaLLM
 
@@ -38,17 +40,37 @@ from langchain_ollama import OllamaEmbeddings, OllamaLLM
 # This reads the MSSQL_CONNECTION_STRING variable for database connectivity
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
+# Configuration from environment variables (with sensible defaults for local dev)
+OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'nomic-embed-text')
+LLM_MODEL = os.getenv('LLM_MODEL', 'llama3.2:3b')
+LLM_TEMPERATURE = float(os.getenv('LLM_TEMPERATURE', '0.1'))
+CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3001,http://127.0.0.1:3001').split(',')
+
+@asynccontextmanager
+async def lifespan(app):
+    """Initialize models and database caches at startup, cleanup on shutdown."""
+    global embeddings_model, known_categories, known_authors
+    embeddings_model = initialize_embedding_model()
+    known_categories = fetch_categories_from_database()
+    known_authors = fetch_authors_from_database()
+    print("✅ Startup complete - embedding model, categories, and authors ready")
+    yield
+
 # Initialize FastAPI application
 app = FastAPI(
     title="Library Chat Service",
     description="AI-powered RAG semantic search with natural language responses over library books",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # Configure CORS to allow requests from the frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3001", "http://127.0.0.1:3001"],  # Frontend URL
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, OPTIONS, etc.)
     allow_headers=["*"],  # Allow all headers
@@ -93,8 +115,10 @@ class Message(BaseModel):
 
 class ChatRequest(BaseModel):
     """Request body for chat endpoint"""
-    question: str
-    conversation_history: List[Message] = []  # Optional conversation history
+    question: str = Field(..., min_length=1, max_length=500)
+    # TODO: conversation_history is accepted for API compatibility but not yet used
+    # in prompt construction. Reserved for future multi-turn support.
+    conversation_history: List[Message] = []
 
     class Config:
         json_schema_extra = {
@@ -166,8 +190,9 @@ def initialize_embedding_model():
     # Ollama must be running: ollama serve
     # Model produces 768-dimensional vectors
     embeddings = OllamaEmbeddings(
-        model="nomic-embed-text",
-        base_url="http://localhost:11434"
+        model=EMBEDDING_MODEL,
+        base_url=OLLAMA_BASE_URL,
+        request_timeout=30
     )
 
     print("✅ Embedding model loaded")
@@ -261,9 +286,10 @@ def initialize_llm_model():
     # Ollama must be running: ollama serve
     # Using low temperature (0.1) to reduce hallucinations and keep responses focused
     llm = OllamaLLM(
-        model="llama3.2:3b",
-        base_url="http://localhost:11434",
-        temperature=0.1  # Low creativity - more deterministic to prevent hallucination
+        model=LLM_MODEL,
+        base_url=OLLAMA_BASE_URL,
+        temperature=LLM_TEMPERATURE,
+        request_timeout=60
     )
 
     print("✅ LLM model loaded")
@@ -788,20 +814,6 @@ def validate_and_fix_response(response: str, retrieved_books: List[Dict]) -> str
             fallback += f"{i}. **{book['title']}** by {book.get('author', 'Unknown')} ({book['year']}) - {book['category']}\n"
         return fallback
 
-@app.on_event("startup")
-async def startup_event():
-    """
-    Initialize the embedding model and fetch categories and authors when the FastAPI application starts.
-    The LLM model is loaded on-demand to prevent memory issues at startup.
-    This ensures the embedding model is loaded once and reused for all requests.
-    Categories and authors are fetched from the database for dynamic detection.
-    """
-    global embeddings_model, known_categories, known_authors
-    embeddings_model = initialize_embedding_model()
-    known_categories = fetch_categories_from_database()
-    known_authors = fetch_authors_from_database()
-    print("✅ Startup complete - embedding model, categories, and authors ready")
-
 @app.get("/")
 async def root():
     """Health check endpoint"""
@@ -951,8 +963,8 @@ async def chat(request: ChatRequest):
         )
 
     except Exception as e:
-        print(f"❌ Error processing chat request: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error processing chat request: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An error occurred processing your request. Please try again.")
 
 @app.get("/health")
 async def health_check():
@@ -972,9 +984,10 @@ async def health_check():
             "model": "loaded" if embeddings_model else "not loaded"
         }
     except Exception as e:
+        logger.error(f"Health check failed: {e}", exc_info=True)
         return {
             "status": "unhealthy",
-            "error": str(e)
+            "error": "Database connection failed"
         }
 
 if __name__ == "__main__":
@@ -989,8 +1002,8 @@ if __name__ == "__main__":
     print("📍 API: http://localhost:8000")
     print("📚 Docs: http://localhost:8000/docs")
     print("🤖 Models:")
-    print("   - Embeddings: nomic-embed-text (768-dim)")
-    print("   - LLM: llama3.2:3b (natural language generation)")
+    print(f"   - Embeddings: {EMBEDDING_MODEL} (768-dim)")
+    print(f"   - LLM: {LLM_MODEL} (natural language generation)")
     print("📋 Pattern: RAG (Retrieval-Augmented Generation)")
     print("🛡️  Guardrails: System prompt prevents hallucination")
     print("=" * 60)
