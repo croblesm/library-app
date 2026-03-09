@@ -132,17 +132,11 @@
 
 <div class="card">
     <h3>Step 3: Use Copilot to Create the Magazines Table</h3>
-    <p class="voiceover">"Here's where it gets interesting. Instead of manually adding columns one by one, I'll ask GitHub Copilot -- right here in the Schema Designer -- to create the table for me based on a JSON sample."</p>
-    <pre id="code1">Create a new table called magazines that matches this JSON structure. Use clean T-SQL best practices:
-{
-  "id": 1,
-  "title": "Tech Monthly",
-  "issue": 1,
-  "year": 2025,
-  "category": "Science"
-}</pre>
+    <p class="voiceover">"Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask Copilot to create the table from that selection."</p>
+    <p><em>Show: Open <code>ModernApp.js</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
+    <pre id="code1">using the selected JSON structure, create a new table called Magazines</pre>
     <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
-    <p class="voiceover">"Notice how Copilot understood the JSON and created the table with appropriate data types -- INT for id with identity, NVARCHAR for strings, INT for numbers. And it followed the project's lowercase naming conventions."</p>
+    <p class="voiceover">"This is the key moment -- Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
 </div>
 
 <div class="card">
