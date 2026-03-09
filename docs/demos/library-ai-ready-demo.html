@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Making the Library App AI-Ready with SQL Server 2025</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            padding: 2rem;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 6px solid #4f46e5;
+        }
+        pre {
+            background-color: #282c34;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        .copy-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+            margin-top: 0.5rem;
+        }
+        .voiceover {
+            font-style: italic;
+            margin: 0.5rem 0 1rem;
+            color: #555;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 2rem;
+            background: #4f46e5;
+            color: white;
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        body.dark {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+
+        body.dark .card {
+            background-color: #2e2e2e;
+            border-left-color: #90cdf4;
+        }
+
+        body.dark h1, body.dark h2, body.dark h3 {
+            color: #ffffff;
+        }
+
+        body.dark .copy-btn {
+            background-color: #90cdf4;
+            color: black;
+        }
+
+        body.dark pre {
+            background-color: #111;
+            color: #eee;
+        }
+
+        body.dark code {
+            background-color: #333;
+            color: #90cdf4;
+        }
+
+        body.dark .voiceover {
+            color: #aaa;
+        }
+
+        body.dark #toast {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+    }
+</script>
+
+<h1>🤖 Making the Library App AI-Ready with SQL Server 2025</h1>
+
+<h2>🎬 Scenario Introduction</h2>
+<p>I've been asked to add AI-powered semantic search to our existing Library app. The app is built with Node.js and Sequelize, but instead of modifying the ORM layer, I'll enhance the database directly using SQL Server 2025's new VECTOR capabilities.</p>
+
+<p>In this demo, I'll show you how to make an existing app "AI-ready" by:</p>
+<ul>
+    <li>Using <strong>GitHub Copilot in VS Code</strong> to understand the schema and generate the SQL to add VECTOR support</li>
+    <li>Running Python scripts (already prepared) to generate and store embeddings</li>
+    <li>Demonstrating semantic search using SQL Server 2025's native vector similarity functions</li>
+</ul>
+
+<p class="voiceover">"For this demo, I've already set up the environment — Python packages are installed, the .env file is configured with my SQL Server connection string, Ollama is running with the nomic-embed-text model, and the code is ready. Now let's focus on making the database AI-ready using Copilot."</p>
+
+<p><strong>Note:</strong> The books table uses lowercase column names (Sequelize conventions) and doesn't have a description column, so embeddings are generated from title + category.</p>
+
+<h2>🚀 Step-by-Step Walkthrough</h2>
+
+<div class="card">
+    <h3>🔹 Step 1: Connect to SQL Server with the MSSQL Extension</h3>
+    <p class="voiceover">"I've already connected to my SQL Server 2025 database using the MSSQL extension for VS Code. As you can see in the Object Explorer, I have the Library database with tables for books, authors, and the many-to-many relationship table books_authors."</p>
+    <p><em>📌 Show: Object Explorer with Library database expanded, showing the books, authors, and books_authors tables.</em></p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 2: Ask Copilot to Analyze the Books Table</h3>
+    <p class="voiceover">"Now let's use GitHub Copilot to understand the structure of our Books table. Open the Copilot Chat panel and ask it about the schema."</p>
+    <pre id="code1">Using my GitHub Copilot - AI connection profile, describe the books table in the Library database. What columns does it have and what are their data types?</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
+    <p><strong>Expected response:</strong> Copilot will analyze the books table and show you columns like id, title, year, pages, image_url, category (all lowercase, matching the Sequelize schema).</p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 3: Ask Copilot to Generate the ALTER TABLE Statement</h3>
+    <p class="voiceover">"Next, we'll ask Copilot to help us add a new VECTOR column to store embeddings. This is where SQL Server 2025's new VECTOR data type comes in. I'm using Ollama's nomic-embed-text model, which produces 768-dimensional vectors."</p>
+    <pre id="code2">Ok, now I want to add semantic search capabilities to the books table. Generate the appropriate statement that adds a new column called description_embedding as a vector data type to store embeddings.</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
+    <p><strong>Expected SQL:</strong></p>
+    <pre id="code3">ALTER TABLE books
+ADD description_embedding VECTOR(768) NULL;</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 4: Ask Copilot to Create a Vector Index</h3>
+    <p class="voiceover">"For optimal performance with vector similarity searches, we should create an index on the VECTOR column. Let's ask Copilot to generate that statement too."</p>
+    <pre id="code4">Create a vector index on the description_embedding column in the books table to optimize similarity search queries.</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
+    <p><strong>Expected SQL:</strong></p>
+    <pre id="code5">CREATE INDEX IX_books_description_embedding
+ON books(description_embedding);</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
+    <p><em>Note: In the demo, we assume these schema changes have already been applied.</em></p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 5: Run the Embedding Backfill Script</h3>
+    <p class="voiceover">"Now that we've added the VECTOR column and index to our schema, it's time to populate it with embeddings. I've already prepared a Python script that will generate embeddings for all our books using Ollama. Let me run it now."</p>
+    <pre id="code6">python app/backend/ai/backfill_embeddings.py</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button>
+    <p class="voiceover">"The script connects to SQL Server, reads all books from our database, generates 768-dimensional vector embeddings using Ollama's nomic-embed-text model, and populates the new VECTOR column. This should only take a few seconds for our 24 books."</p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 6: Verify the Embeddings in the Database</h3>
+    <p class="voiceover">"Great! Now let's verify in VS Code that the embeddings were successfully created. I'll use Copilot to help me write a quick query to check."</p>
+    <pre id="code7">Show me the first 5 books and whether they have embeddings in the description_embedding column.</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button>
+    <p><strong>Expected SQL that Copilot will generate:</strong></p>
+    <pre id="code8">SELECT TOP 5 id, title,
+       CASE WHEN description_embedding IS NOT NULL
+            THEN 'Embedding exists'
+            ELSE 'No embedding'
+       END AS EmbeddingStatus
+FROM books;</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code8')">Copy</button>
+    <p class="voiceover">"Perfect! All our books now have vector embeddings stored in SQL Server 2025."</p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 7: Start the Chat Service</h3>
+    <p class="voiceover">"Now for the exciting part — I've built a FastAPI service that performs semantic search over our books using SQL Server 2025's vector similarity functions. Let me start it up."</p>
+    <pre id="code9">python app/backend/ai/chat_service.py</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code9')">Copy</button>
+    <p class="voiceover">"The service is now running on port 8000. It exposes a /chat endpoint that takes natural language questions and returns the most relevant books using vector similarity search."</p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 8: Test Semantic Search with Natural Language</h3>
+    <p class="voiceover">"Let's test it! I'll send a natural language question about books I want to read. Watch how it returns relevant results based on semantic similarity, not just keyword matching."</p>
+    <p><strong>Example question:</strong></p>
+    <pre id="code10">I want to read science fiction about space exploration</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code10')">Copy</button>
+
+    <p class="voiceover">"I'll send this to the /chat endpoint using curl — or you can test it in the interactive API docs at localhost:8000/docs."</p>
+
+    <p><strong>curl command:</strong></p>
+    <pre id="code11">curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question": "I want to read science fiction about space exploration"}'</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code11')">Copy</button>
+
+    <p><strong>Response:</strong></p>
+    <pre id="code12">{
+  "question": "I want to read science fiction about space exploration",
+  "results": [
+    {
+      "id": 9,
+      "title": "2001: A Space Odyssey",
+      "category": "Science Fiction",
+      "year": 1968,
+      "similarity_score": 0.89
+    },
+    {
+      "id": 10,
+      "title": "2010: Odyssey Two",
+      "category": "Science Fiction",
+      "year": 1982,
+      "similarity_score": 0.85
+    },
+    {
+      "id": 20,
+      "title": "From the Earth to the Moon",
+      "category": "Adventure",
+      "year": 1865,
+      "similarity_score": 0.78
+    }
+  ]
+}</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code12')">Copy</button>
+    <p class="voiceover">"Notice how it returned books about space — Arthur C. Clarke's Space Odyssey series and Jules Verne's journey to the moon. The semantic search understood the meaning of my question, not just keyword matching!"</p>
+</div>
+
+<div class="card">
+    <h3>🔹 Step 9: Understanding the Vector Search SQL</h3>
+    <p class="voiceover">"So how does this actually work? Let me show you the SQL query that powers the vector similarity search. This demonstrates how SQL Server 2025's VECTOR_DISTANCE function compares book embeddings."</p>
+    <pre id="code13">-- Vector similarity search query (768-dimensional vectors from Ollama)
+-- This query finds books similar to a reference book by comparing their embeddings
+DECLARE @ReferenceBookId INT = 9; -- "2001: A Space Odyssey"
+
+SELECT TOP 3
+    b.id,
+    b.title,
+    b.category,
+    b.year,
+    CAST(1 - VECTOR_DISTANCE('cosine', b.description_embedding, 
+         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) AS FLOAT) AS SimilarityScore
+FROM books b
+WHERE b.description_embedding IS NOT NULL
+    AND b.id != @ReferenceBookId
+ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding, 
+         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) ASC;</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code13')">Copy</button>
+    <p class="voiceover">"The VECTOR_DISTANCE function calculates the cosine similarity between a reference book's embedding and all other books' embeddings. It returns varying similarity scores based on semantic closeness. In our chat service, we generate the embedding from the user's natural language question and use that as the query vector instead. It's running entirely in SQL Server — no external vector database needed."</p>
+</div>
+
+<h2>🎯 What We Accomplished</h2>
+<div class="card">
+    <p>In this demo, we successfully transformed a traditional SQL Server–backed app into an AI-ready system with semantic search capabilities:</p>
+    <ul>
+        <li>✅ Set up Ollama for simple, local embedding model management</li>
+        <li>✅ Added a <code>VECTOR(768)</code> column to the books table</li>
+        <li>✅ Used lowercase column names matching the Sequelize schema</li>
+        <li>✅ Created a vector index for optimal search performance</li>
+        <li>✅ Built a Python script to generate and backfill embeddings using the <code>mssql-python</code> driver</li>
+        <li>✅ Used Ollama's <code>nomic-embed-text</code> model for 768-dimensional embeddings</li>
+        <li>✅ Generated embeddings from title + category (since no description column exists)</li>
+        <li>✅ Created a FastAPI chat service that performs vector similarity search</li>
+        <li>✅ Used GitHub Copilot to understand the schema and generate SQL statements</li>
+        <li>✅ Leveraged SQL Server 2025's native vector search capabilities</li>
+    </ul>
+    <p><strong>Key takeaways:</strong></p>
+    <ul>
+        <li>SQL Server 2025's VECTOR type enables native storage and search of embeddings</li>
+        <li>The <code>mssql-python</code> driver provides a clean, modern interface for Python applications</li>
+        <li>Ollama provides simple, local embedding model management without API keys</li>
+        <li>LangChain makes it easy to integrate Ollama and other embedding models</li>
+        <li>Vector similarity search enables powerful semantic search without complex infrastructure</li>
+        <li>GitHub Copilot + MSSQL extension accelerates database development workflows</li>
+    </ul>
+</div>
+
+<h2>🎯 Closing Statement</h2>
+<p class="voiceover">"In just a few minutes, we used GitHub Copilot to evolve our database schema, added SQL Server 2025's VECTOR capabilities with Ollama for embeddings, and demonstrated semantic search — all without changing a single line of our Node.js application code. The app is now AI-ready."</p>
+
+<p><strong>Key takeaways:</strong></p>
+<ul>
+    <li>SQL Server 2025's VECTOR type brings AI capabilities directly into your database — no external vector store needed</li>
+    <li>Ollama makes local embedding models simple to manage without API keys or cloud dependencies</li>
+    <li>GitHub Copilot + MSSQL extension accelerates schema evolution with natural language prompts</li>
+    <li>Semantic search enables users to find content by meaning, not just keywords</li>
+    <li>Existing apps can become AI-ready without rewriting application code</li>
+</ul>
+
+<h2>📚 Resources</h2>
+<div class="card">
+    <p>Want to try this yourself?</p>
+    <ul>
+        <li>📖 <strong>Setup Instructions:</strong> See <a href="README-ai-ready-demo.md">README-ai-ready-demo.md</a> for complete environment setup, Python dependencies, and step-by-step instructions</li>
+        <li>🐍 <strong>Python Scripts:</strong> Check <code>app/backend/ai/</code> for the backfill and chat service code</li>
+        <li>💡 <strong>SQL Server 2025:</strong> Learn more about VECTOR data types and vector similarity search</li>
+        <li>🤖 <strong>GitHub Copilot:</strong> Sign up for access to Copilot with the MSSQL extension</li>
+    </ul>
+</div>
+
+<h2>🙏 Thank You!</h2>
+<p><strong>We'd love your feedback — and we can't wait to see what you build!</strong></p>
+
+<script>
+function copyToClipboard(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 2000);
+    });
+}
+</script>
+
+<div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #323232;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 1000;
+">
+📋 Copied to clipboard!
+</div>
+
+</body>
+</html>

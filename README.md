@@ -89,6 +89,13 @@ library-app/
 │           │   ├── ModernApp.css       # Styles
 │           │   └── index.js            # Entry point
 │           └── package.json
+├── docs/                               # Documentation
+│   ├── PRD.md                          # Product Requirements Document
+│   └── demos/                          # Step-by-step demo walkthroughs
+│       ├── github-copilot-demo.html    # GitHub Copilot + MSSQL extension demo
+│       ├── library-ai-ready-demo.html  # AI-ready demo (VECTOR + RAG)
+│       ├── library-demo-flow.html      # End-to-end demo flow
+│       └── schema-designer-demo.html   # Schema Designer demo
 ├── infrastructure/                     # Terraform files for Microsoft Fabric
 ├── .devcontainer/
 │   └── devcontainer.json               # Dev container / Codespaces configuration
@@ -233,7 +240,6 @@ ollama pull llama3.2:3b         # LLM for natural language responses
 ```
 
 ### 4. Add the VECTOR Column to SQL Server
-
 Run these SQL statements against your Library database:
 
 ```sql
@@ -408,6 +414,34 @@ erDiagram
 ```
 
 **Seed data:** 5 authors (Asimov, Clarke, Wells, Verne, Dick) and 24 books across Science Fiction, Classic Science Fiction, Adventure, Dystopian Science Fiction, and Alternate History.
+
+---
+
+## Documentation & Demo Guides
+
+### Product Requirements Document
+
+The [PRD](docs/PRD.md) defines the full scope of the application — data model, user stories, API endpoints, seed data, and non-goals. Use it as the source of truth for what the app should and shouldn't do.
+
+### GitHub Copilot Custom Instructions
+
+The project includes a [GitHub Copilot custom instructions file](.github/copilot-instructions.md) that teaches Copilot about the project's conventions: SQL Server only, Sequelize patterns, lowercase snake_case naming, `global.models` access, and more. This file is automatically loaded by GitHub Copilot in VS Code whenever you work in this repository, helping it generate code that follows the project's rules without you having to repeat them.
+
+> [!TIP]
+> Additional AI agent instruction files are included for other tools: [AGENTS.md](AGENTS.md) (Codex, Cline, Windsurf, Gemini CLI, Aider), [CLAUDE.md](CLAUDE.md) (Claude Code), and [.cursorrules](.cursorrules) (Cursor).
+
+### Demo Walkthroughs
+
+Interactive HTML guides are available in [`docs/demos/`](docs/demos/) for reproducing live presentations:
+
+| Demo | File | Description |
+|------|------|-------------|
+| GitHub Copilot + MSSQL | [`github-copilot-demo.html`](docs/demos/github-copilot-demo.html) | Using Copilot with the MSSQL extension for database development |
+| AI-Ready with SQL Server 2025 | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Adding VECTOR columns, embeddings, and semantic search |
+| Schema Designer | [`schema-designer-demo.html`](docs/demos/schema-designer-demo.html) | Visual schema design with the MSSQL extension |
+| End-to-End Flow | [`library-demo-flow.html`](docs/demos/library-demo-flow.html) | Full demo orchestration from setup to AI search |
+
+Open any `.html` file in a browser to follow along step-by-step with copyable code snippets.
 
 ---
 

@@ -15,11 +15,21 @@ import {
   SearchOff as SearchOffIcon,
   PersonOff as PersonOffIcon,
   Chat as ChatIcon,
-  Send as SendIcon
+  Send as SendIcon,
+  Article as ArticleIcon
 } from '@mui/icons-material';
 
 const API_BASE = 'http://localhost:3000';
 const CHAT_API_BASE = 'http://localhost:8000';
+
+// Hardcoded magazine data (will be replaced with DAB endpoint later)
+const MAGAZINES_DATA = [
+  { id: 1, title: "Tech Monthly", issue: 1, year: 2025, category: "Science" },
+  { id: 2, title: "Quantum Quarterly", issue: 4, year: 2024, category: "Physics" },
+  { id: 3, title: "Bio Frontiers", issue: 2, year: 2025, category: "Biology" },
+  { id: 4, title: "Robo World", issue: 7, year: 2024, category: "Robotics" },
+  { id: 5, title: "Star Gazer", issue: 12, year: 2023, category: "Astronomy" },
+];
 
 // Dark theme - True dark mode (almost black background)
 const darkTheme = createTheme({
@@ -193,6 +203,21 @@ function Header({ searchTerm, onSearchChange }) {
             }}
           >
             Authors
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/magazines"
+            color="inherit"
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              fontWeight: location.pathname === '/magazines' ? 600 : 400,
+              borderBottom: location.pathname === '/magazines' ? '2px solid #60a5fa' : 'none',
+              borderRadius: 0,
+              px: 2
+            }}
+          >
+            Magazines
           </Button>
         </Box>
 
@@ -478,6 +503,132 @@ function BookCard({ book }) {
           }}
         >
           {book.authors?.map(a => `${a.first_name} ${a.last_name}`).join(', ') || 'Unknown Author'}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
+
+function MagazineCard({ magazine }) {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  return (
+    <Card
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        width: '200px',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: '0 12px 32px rgba(96, 165, 250, 0.2)',
+        }
+      }}
+    >
+      <Box
+        sx={{
+          height: '280px',
+          width: '100%',
+          background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.12) 0%, rgba(167, 139, 250, 0.12) 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+        }}
+      >
+        <ArticleIcon sx={{
+          fontSize: '4rem',
+          color: 'rgba(96, 165, 250, 0.4)',
+          transition: 'transform 0.3s ease',
+          transform: isHovered ? 'scale(1.1)' : 'scale(1)'
+        }} />
+        <Typography sx={{ color: 'rgba(96, 165, 250, 0.5)', fontSize: '0.75rem', mt: 1.5, fontWeight: 500 }}>
+          Issue #{magazine.issue}
+        </Typography>
+
+        {/* Hover overlay with metadata */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent)',
+            opacity: isHovered ? 1 : 0,
+            transition: 'opacity 0.3s ease',
+            p: 1.5,
+            display: 'flex',
+            gap: 2,
+            justifyContent: 'center'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography sx={{ fontSize: '0.75rem', color: '#60a5fa', fontWeight: 600 }}>
+              {magazine.year}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography sx={{ fontSize: '0.75rem', color: '#a78bfa', fontWeight: 600 }}>
+              Issue #{magazine.issue}
+            </Typography>
+          </Box>
+        </Box>
+
+        {magazine.category && (
+          <Box sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+            backdropFilter: 'blur(10px)',
+            color: '#000',
+            px: 1.2,
+            py: 0.4,
+            borderRadius: '4px',
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            boxShadow: isHovered ? '0 4px 12px rgba(96, 165, 250, 0.3)' : 'none',
+            transition: 'box-shadow 0.3s ease'
+          }}>
+            {magazine.category}
+          </Box>
+        )}
+      </Box>
+      <CardContent sx={{
+        p: 1.5,
+        '&:last-child': { pb: 1.5 }
+      }}>
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 0.5,
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            color: '#f5f5f5',
+            lineHeight: 1.4
+          }}
+        >
+          {magazine.title}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: '#808080',
+            fontSize: '0.8rem',
+          }}
+        >
+          {magazine.year} &middot; Issue {magazine.issue}
         </Typography>
       </CardContent>
     </Card>
@@ -1715,6 +1866,110 @@ function AuthorsPage({ authors, onRefresh }) {
   );
 }
 
+function MagazinesPage({ magazines }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('title');
+
+  let filteredMagazines = magazines.filter(mag =>
+    mag.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    mag.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  filteredMagazines = [...filteredMagazines].sort((a, b) => {
+    switch (sortBy) {
+      case 'title':
+        return a.title.localeCompare(b.title);
+      case 'newest':
+        return b.year - a.year;
+      case 'oldest':
+        return a.year - b.year;
+      default:
+        return 0;
+    }
+  });
+
+  return (
+    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 4 }}>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>Magazines</Typography>
+
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+        <TextField
+          placeholder="Search magazines..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          variant="outlined"
+          fullWidth
+          size="small"
+          sx={{
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              color: '#f5f5f5',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.15)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(96, 165, 250, 0.3)',
+              },
+            },
+          }}
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.6)', fontSize: '1.3rem' }} />
+          }}
+        />
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <Select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            sx={{
+              color: '#f5f5f5',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(255, 255, 255, 0.15)',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(96, 165, 250, 0.3)',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#60a5fa',
+              },
+            }}
+          >
+            <MenuItem value="title">Sort by Title</MenuItem>
+            <MenuItem value="newest">Newest First</MenuItem>
+            <MenuItem value="oldest">Oldest First</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {filteredMagazines.length > 0 ? (
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, 200px)',
+          gap: 2.5,
+          justifyContent: 'center'
+        }}>
+          {filteredMagazines.map(magazine => (
+            <MagazineCard key={magazine.id} magazine={magazine} />
+          ))}
+        </Box>
+      ) : (
+        <EmptyState
+          icon={SearchOffIcon}
+          title="No magazines found"
+          description={
+            searchTerm
+              ? "We couldn't find any magazines matching your search. Try a different search term."
+              : "No magazines available yet."
+          }
+          actionLabel={searchTerm ? "Clear search" : undefined}
+          onAction={searchTerm ? () => setSearchTerm('') : undefined}
+        />
+      )}
+    </Box>
+  );
+}
+
 export default function ModernApp() {
   const [books, setBooks] = useState([]);
   const [authors, setAuthors] = useState([]);
@@ -1780,6 +2035,7 @@ export default function ModernApp() {
           <Route path="/" element={<HomePage books={books} searchTerm={searchTerm} />} />
           <Route path="/books" element={<BooksPage books={books} authors={authors} onRefresh={fetchData} />} />
           <Route path="/authors" element={<AuthorsPage authors={authors} onRefresh={fetchData} />} />
+          <Route path="/magazines" element={<MagazinesPage magazines={MAGAZINES_DATA} />} />
         </Routes>
       </Router>
     </ThemeProvider>
