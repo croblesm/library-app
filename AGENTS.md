@@ -88,6 +88,9 @@ library-app/
 │           │   ├── ModernApp.js        # Main app component
 │           │   └── index.js            # Entry point
 │           └── package.json
+├── docs/                               # Documentation
+│   ├── PRD.md                          # Product Requirements Document
+│   └── demos/                          # Step-by-step demo walkthroughs
 ├── infrastructure/                     # Terraform for Microsoft Fabric
 └── README.md                           # Setup and usage guide
 ```

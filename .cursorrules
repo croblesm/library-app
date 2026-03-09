@@ -8,6 +8,6 @@ REACT FRONTEND (port 3001): React 18 + MUI v7 + Tailwind CSS v4. Main component:
 
 ENVIRONMENT: Never hardcode passwords. Node.js uses app/backend/config/.env (DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE). Use .env.example templates with placeholder values.
 
-KEY FILES: Express entry: app/backend/index.js | Models: app/backend/models/ | Routes: app/backend/routes/ | DB config: app/backend/config/db.js | React: app/frontend/library-frontend/src/ModernApp.js
+KEY FILES: Express entry: app/backend/index.js | Models: app/backend/models/ | Routes: app/backend/routes/ | DB config: app/backend/config/db.js | React: app/frontend/library-frontend/src/ModernApp.js | PRD: docs/PRD.md
 
 DO NOT: Switch database from SQL Server | Add timestamps to models | Use camelCase for DB columns | Create or modify files in .demo/

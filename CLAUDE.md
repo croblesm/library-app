@@ -46,6 +46,13 @@ app/backend/scripts/          Utility scripts (dropAllTables.js, SQL files)
 app/frontend/library-frontend/  React SPA
   src/ModernApp.js            Main component (all UI in one file)
   src/index.js                Entry point
+docs/                         Documentation
+  PRD.md                      Product Requirements Document (base app spec)
+  demos/                      Step-by-step demo walkthroughs (HTML)
+    github-copilot-demo.html  GitHub Copilot + MSSQL extension demo
+    library-ai-ready-demo.html AI-ready demo (VECTOR + RAG)
+    library-demo-flow.html    End-to-end demo orchestration
+    schema-designer-demo.html Schema Designer + Copilot demo
 infrastructure/               Terraform for Microsoft Fabric provisioning
 ```
 
@@ -57,10 +64,11 @@ infrastructure/               Terraform for Microsoft Fabric provisioning
 - Routes access models via `global.models` (e.g., `const { Book, Author } = global.models;`)
 - All models have `timestamps: false` -- no createdAt/updatedAt columns
 - Many-to-many: books <-> authors through books_authors junction table with cascade delete
-- Vector embeddings: 768-dimensional via Ollama nomic-embed-text
+- Vector embeddings: 768-dimensional via Ollama nomic-embed-text (configurable via EMBEDDING_MODEL env var)
 - Embedding text format: `"Book: {title}, Author: {author}, Category: {category}, Year: {year}"`
 - RAG pattern: embed user question -> vector similarity search in SQL Server -> format context -> LLM generates response
-- Hallucination guardrails: system prompt + response validation + low temperature (0.1)
+- Hallucination guardrails: system prompt + response validation + low temperature (configurable via LLM_TEMPERATURE env var)
+- Frontend pages: Home (/), Books (/books), Authors (/authors), Magazines (/magazines -- hardcoded data for demo)
 
 ## Environment Files
 
@@ -89,6 +97,13 @@ DB_CONNECTION_STRING=mssql://<server>.msit-database.fabric.microsoft.com:1433/<d
 
 ```
 MSSQL_CONNECTION_STRING=Server=<your-server>;Database=<your-database>;UID=<your-username>;PWD=<your-password>;TrustServerCertificate=yes;
+
+# Optional overrides (defaults shown):
+# OLLAMA_BASE_URL=http://localhost:11434
+# EMBEDDING_MODEL=nomic-embed-text
+# LLM_MODEL=llama3.2:3b
+# LLM_TEMPERATURE=0.1
+# CORS_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
 ```
 
 Note: The Python service uses ADO.NET-style connection strings with `UID`/`PWD`, NOT `User Id`/`Password`.
@@ -182,4 +197,4 @@ This project includes instruction files for multiple AI coding agents:
 | `.github/copilot-instructions.md` | GitHub Copilot |
 | `.cursorrules` | Cursor |
 
-All files enforce the same constraints: SQL Server only, Sequelize conventions, mssql_python driver, Ollama local models, 768-dimensional vectors, lowercase snake_case naming.
+**CRITICAL:** AGENTS.md, copilot-instructions.md, and .cursorrules describe ONLY the base app (no VECTOR, no AI, no Python). CLAUDE.md includes full AI/VECTOR details since Claude Code is used separately from live Copilot demos. All files enforce: SQL Server only, Sequelize conventions, lowercase snake_case naming.
