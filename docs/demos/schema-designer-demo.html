@@ -162,27 +162,41 @@ Ensure that the foreign key columns align with the current database schema for b
 
 <div class="card">
     <h3>Step 7: Generate Science-Themed Test Data</h3>
-    <p class="voiceover">"Now I need some test data. Let me ask GitHub Copilot to generate realistic INSERT statements for our new table."</p>
-    <pre id="code3">Generate sample INSERT statements for the magazines table.
+    <p class="voiceover">"Now I need some test data. Instead of writing it by hand, I'll ask GitHub Copilot to generate realistic mockup data for our new table."</p>
+    <pre id="code3">Generate mockup data for the magazines table.
 - Each magazine should be themed around science or technology (e.g., astronomy, physics, biology, robotics).
 - Include at least 5 magazines with creative titles, different issues, and years.
-- Make sure the INSERT statements follow typical SQL conventions, leaving out any auto-generated columns.
-- Then, link each magazine to one or more existing authors in the authors table using the junction table.</pre>
+- Also link each magazine to one or more existing authors in the authors table using the junction table.</pre>
     <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
+    <p class="voiceover">"Before running anything, let me review what GitHub Copilot generated. I can see the SQL script it created -- let me inspect it to make sure the data looks right and the foreign keys match our schema."</p>
+    <p><em>Show: Review the generated SQL script. Once satisfied, execute it.</em></p>
+    <p class="voiceover">"Looks good. Now let me verify the data actually landed in the database."</p>
+    <pre id="code3b">Show me all the data in the magazines table and their linked authors</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code3b')">Copy</button>
+    <p class="voiceover">"There it is -- GitHub Copilot wrote the query, and I can see the mockup data with the author relationships. Everything checks out."</p>
 </div>
 
 <div class="card">
-    <h3>Step 8: Set Up a REST API with Data API Builder</h3>
+    <h3>Step 8: Open Data API Builder</h3>
     <p class="voiceover">"Now for the final piece -- I need a REST API for the frontend to call. Instead of writing Express routes and Sequelize models, I'll use Data API Builder to create an endpoint in seconds. DAB reads my database schema and exposes it as a REST API automatically."</p>
-    <p><em>Show: Open the Data API Builder configuration from the MSSQL extension. Select the magazines table and enable REST API with all CRUD operations. Show the configuration UI with entity name, source table, and permissions.</em></p>
-    <p class="voiceover">"With one click, I've got a fully functional REST API for magazines. DAB handles all the CRUD operations, pagination, filtering, and even supports OData queries out of the box."</p>
+    <p><em>Show: Open the Data API Builder configuration from the MSSQL extension. Notice it picked up all 5 entities from the dbo schema: authors, books_authors, magazines_authors, books, and magazines -- all with full CRUD enabled.</em></p>
+    <p class="voiceover">"DAB automatically detected all the tables in my schema. But I only need the magazines endpoint for now, and I want it read-only. Let me ask GitHub Copilot to clean this up."</p>
 </div>
 
 <div class="card">
-    <h3>Step 9: Wire the Frontend to the DAB Endpoint</h3>
+    <h3>Step 9: Configure the API with GitHub Copilot</h3>
+    <p class="voiceover">"Instead of manually unchecking entities and toggling permissions one by one, I'll ask GitHub Copilot to do it for me."</p>
+    <pre id="code4">Remove all entities from the dbo schema and keep only the magazines entity. Make it a read-only endpoint -- I only need the Read permission enabled.</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
+    <p class="voiceover">"Done -- GitHub Copilot removed the other entities and set magazines to read-only. Now I just need to deploy it."</p>
+    <p><em>Show: The DAB configuration now shows only the magazines entity with only the Read checkbox enabled. Click Deploy.</em></p>
+</div>
+
+<div class="card">
+    <h3>Step 10: Wire the Frontend to the DAB Endpoint</h3>
     <p class="voiceover">"Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Let me show the quick change in ModernApp.js."</p>
     <p><em>Show: In ModernApp.js, replace the <code>MAGAZINES_DATA</code> constant with an API call to the DAB endpoint. The MagazinesPage component already supports receiving data as a prop.</em></p>
-    <pre id="code4">// Before: hardcoded data
+    <pre id="code5">// Before: hardcoded data
 const MAGAZINES_DATA = [
   { id: 1, title: "Tech Monthly", ... },
   ...
@@ -195,11 +209,11 @@ useEffect(() => {
     .then(res => setMagazines(res.data.value))
     .catch(err => console.error(err));
 }, []);</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
+    <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
 </div>
 
 <div class="card">
-    <h3>Step 10: Verify in the App</h3>
+    <h3>Step 11: Verify in the App</h3>
     <p class="voiceover">"Let me refresh the app and navigate to the Magazines page. Now we're seeing live data from the database, served through DAB, displayed in our React frontend. The full stack is connected."</p>
     <p><em>Show: Refresh the frontend at <code>http://localhost:3001/magazines</code>. The magazine cards now show the science-themed data we inserted from the database.</em></p>
 </div>
@@ -212,7 +226,7 @@ useEffect(() => {
         <li>Used <strong>GitHub Copilot</strong> integrated in Schema Designer to generate table structures from JSON</li>
         <li>Added a <strong>many-to-many relationship</strong> with the existing authors table</li>
         <li>Generated <strong>science-themed test data</strong> with GitHub Copilot</li>
-        <li>Created a <strong>REST API in seconds</strong> using Data API Builder</li>
+        <li>Created a <strong>read-only REST API</strong> using Data API Builder, configured with GitHub Copilot</li>
         <li>Wired the <strong>React frontend</strong> to the live API endpoint</li>
     </ul>
     <p><strong>Key takeaways:</strong></p>
