@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import {
   AppBar, Toolbar, TextField, Button, Box, Grid, Card, CardContent,
   CardMedia, Typography, Slider, FormGroup, FormControlLabel, Checkbox,
-  Pagination, Select, MenuItem, FormControl, Snackbar, Alert, Paper, Skeleton
+  Pagination, Select, MenuItem, FormControl, Snackbar, Alert, Paper, Skeleton, Tooltip
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -22,7 +22,7 @@ import {
 const API_BASE = 'http://localhost:3000';
 const CHAT_API_BASE = 'http://localhost:8000';
 
-// Hardcoded magazine data (will be replaced with DAB endpoint later)
+// Step 10a: Comment out this hardcoded data and switch to DAB endpoint
 const MAGAZINES_DATA = [
   { id: 1, title: "Tech Monthly", issue: 1, year: 2025, category: "Science" },
   { id: 2, title: "Quantum Quarterly", issue: 4, year: 2024, category: "Physics" },
@@ -30,6 +30,7 @@ const MAGAZINES_DATA = [
   { id: 4, title: "Robo World", issue: 7, year: 2024, category: "Robotics" },
   { id: 5, title: "Star Gazer", issue: 12, year: 2023, category: "Astronomy" },
 ];
+
 
 // Dark theme - True dark mode (almost black background)
 const darkTheme = createTheme({
@@ -382,30 +383,37 @@ function BookCard({ book }) {
         }}
       >
         {book.image_url ? (
-          <img
-            src={book.image_url}
-            alt={book.title}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transition: 'transform 0.3s ease',
-              transform: isHovered ? 'scale(1.05)' : 'scale(1)'
-            }}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.style.display = 'flex';
-              e.target.parentElement.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%);">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="rgba(96, 165, 250, 0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="rgba(96, 165, 250, 0.4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  <p style="color: rgba(96, 165, 250, 0.5); font-size: 0.75rem; margin-top: 12px; font-weight: 500;">No Cover</p>
-                </div>
-              `;
-            }}
-          />
+          <>
+            <img
+              src={book.image_url}
+              alt={book.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transition: 'transform 0.3s ease',
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)'
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+              onLoad={(e) => {
+                // Open Library returns a tiny 1x1 placeholder for missing covers
+                if (e.target.naturalWidth <= 10 || e.target.naturalHeight <= 10) {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }
+              }}
+            />
+            <Box sx={{ display: 'none', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%)' }}>
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="rgba(96, 165, 250, 0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="rgba(96, 165, 250, 0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <Typography sx={{ color: 'rgba(96, 165, 250, 0.5)', fontSize: '0.75rem', mt: 1.5, fontWeight: 500 }}>No Cover</Typography>
+            </Box>
+          </>
         ) : (
           <>
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1514,28 +1522,33 @@ function BooksPage({ books, authors, onRefresh }) {
           {filteredBooks.map(book => (
             <Box key={book.id} sx={{ position: 'relative' }}>
               <BookCard book={book} />
-              <Button
-                onClick={() => handleDelete(book.id)}
-                sx={{
-                  position: 'absolute',
-                  top: 8,
-                  left: 8,
-                  minWidth: 'auto',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  padding: 0,
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  color: '#ef4444',
-                  '&:hover': {
-                    backgroundColor: '#ef4444',
-                    color: '#fff'
-                  },
-                  zIndex: 1
-                }}
-              >
-                <CloseIcon sx={{ fontSize: '1.2rem' }} />
-              </Button>
+              <Tooltip title="Delete book" arrow>
+                <Button
+                  onClick={() => handleDelete(book.id)}
+                  sx={{
+                    position: 'absolute',
+                    bottom: 52,
+                    right: 8,
+                    minWidth: 'auto',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    padding: 0,
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    color: '#ef4444',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease',
+                    '.MuiBox-root:hover > &': { opacity: 1 },
+                    '&:hover': {
+                      backgroundColor: '#ef4444',
+                      color: '#fff'
+                    },
+                    zIndex: 1
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: '1rem' }} />
+                </Button>
+              </Tooltip>
             </Box>
           ))}
         </Box>
@@ -1562,14 +1575,19 @@ function BooksPage({ books, authors, onRefresh }) {
 
 function AuthorsPage({ authors, onRefresh }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [newAuthor, setNewAuthor] = useState({ first_name: '', middle_name: '', last_name: '' });
+  const [newAuthor, setNewAuthor] = useState({ first_name: '', middle_name: '', last_name: '', image_url: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [sortBy, setSortBy] = useState('name');
 
+  const formatAuthorName = (author) => {
+    const parts = [author.first_name, author.middle_name, author.last_name].filter(Boolean);
+    return parts.join(' ');
+  };
+
   let filteredAuthors = authors.filter(author =>
-    `${author.first_name} ${author.middle_name} ${author.last_name}`
+    `${author.first_name} ${author.middle_name || ''} ${author.last_name}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
@@ -1596,7 +1614,7 @@ function AuthorsPage({ authors, onRefresh }) {
     try {
       setLoading(true);
       await axios.post(`${API_BASE}/authors`, newAuthor);
-      setNewAuthor({ first_name: '', middle_name: '', last_name: '' });
+      setNewAuthor({ first_name: '', middle_name: '', last_name: '', image_url: '' });
       setOpenSnackbar(true);
       onRefresh();
     } catch (error) {
@@ -1665,6 +1683,21 @@ function AuthorsPage({ authors, onRefresh }) {
                 required
                 fullWidth
                 size="small"
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    color: '#808080'
+                  }
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Image URL (optional)"
+                value={newAuthor.image_url}
+                onChange={(e) => setNewAuthor({ ...newAuthor, image_url: e.target.value })}
+                fullWidth
+                size="small"
+                placeholder="https://upload.wikimedia.org/..."
                 sx={{
                   '& .MuiInputLabel-root': {
                     color: '#808080'
@@ -1745,28 +1778,39 @@ function AuthorsPage({ authors, onRefresh }) {
       </Box>
 
       {filteredAuthors.length > 0 ? (
-        <Grid container spacing={2}>
+        <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)'
+          },
+          gap: 2.5
+        }}>
           {filteredAuthors.map(author => {
             const bookCount = author.books?.length || 0;
 
             return (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={author.id}>
-                <Paper sx={{
-                  p: 2.5,
-                  backgroundColor: '#1a1a1a',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  borderRadius: '12px',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  position: 'relative',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 24px rgba(96, 165, 250, 0.2)',
-                    borderColor: 'rgba(96, 165, 250, 0.4)'
-                  }
-                }}>
+              <Paper key={author.id} sx={{
+                p: 3,
+                backgroundColor: '#1a1a1a',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                height: 200,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(96, 165, 250, 0.2)',
+                  borderColor: 'rgba(96, 165, 250, 0.4)'
+                }
+              }}>
+                <Tooltip title="Delete author" arrow>
                   <Button
                     onClick={() => handleDelete(author.id)}
                     sx={{
@@ -1774,13 +1818,15 @@ function AuthorsPage({ authors, onRefresh }) {
                       top: 8,
                       right: 8,
                       minWidth: 'auto',
-                      width: '32px',
-                      height: '32px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '50%',
                       padding: 0,
                       backgroundColor: 'rgba(239, 68, 68, 0.1)',
                       color: '#ef4444',
+                      opacity: 0,
                       transition: 'all 0.2s ease',
+                      '.MuiPaper-root:hover &': { opacity: 1 },
                       '&:hover': {
                         backgroundColor: '#ef4444',
                         color: '#fff',
@@ -1788,61 +1834,77 @@ function AuthorsPage({ authors, onRefresh }) {
                       }
                     }}
                   >
-                    <CloseIcon sx={{ fontSize: '1.2rem' }} />
+                    <CloseIcon sx={{ fontSize: '1rem' }} />
                   </Button>
+                </Tooltip>
+                {author.image_url ? (
+                  <Box
+                    component="img"
+                    src={author.image_url}
+                    alt={formatAuthorName(author)}
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      mb: 1.5,
+                      border: '2px solid rgba(96, 165, 250, 0.3)'
+                    }}
+                  />
+                ) : (
                   <Box sx={{
-                    width: 60,
-                    height: 60,
+                    width: 64,
+                    height: 64,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(167, 139, 250, 0.15) 100%)',
+                    background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(167, 139, 250, 0.2) 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    mb: 2,
+                    mb: 1.5,
                     border: '2px solid rgba(96, 165, 250, 0.3)',
-                    fontSize: '1.5rem'
+                    fontSize: '1.4rem'
                   }}>
                     👤
                   </Box>
-                  <Typography variant="h6" sx={{
-                    mb: 1,
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    color: '#f5f5f5'
+                )}
+                <Typography sx={{
+                  mb: 1,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  color: '#f5f5f5',
+                  textAlign: 'center',
+                  lineHeight: 1.3,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
+                  px: 1
+                }}>
+                  {formatAuthorName(author)}
+                </Typography>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  px: 1.5,
+                  py: 0.5,
+                  backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(96, 165, 250, 0.2)'
+                }}>
+                  <BookIcon sx={{ fontSize: '0.9rem', color: '#60a5fa' }} />
+                  <Typography sx={{
+                    color: '#60a5fa',
+                    fontSize: '0.8rem',
+                    fontWeight: 600
                   }}>
-                    {author.first_name} {author.middle_name} {author.last_name}
+                    {bookCount} {bookCount === 1 ? 'book' : 'books'}
                   </Typography>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    mt: 'auto'
-                  }}>
-                    <Box sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 0.5,
-                      px: 1.5,
-                      py: 0.5,
-                      backgroundColor: 'rgba(96, 165, 250, 0.1)',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(96, 165, 250, 0.2)'
-                    }}>
-                      <BookIcon sx={{ fontSize: '1rem', color: '#60a5fa' }} />
-                      <Typography sx={{
-                        color: '#60a5fa',
-                        fontSize: '0.875rem',
-                        fontWeight: 600
-                      }}>
-                        {bookCount}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grid>
+                </Box>
+              </Paper>
             );
           })}
-        </Grid>
+        </Box>
       ) : (
         <EmptyState
           icon={PersonOffIcon}
@@ -1890,7 +1952,7 @@ function MagazinesPage({ magazines }) {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 3, py: 4 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>Magazines</Typography>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>Manage Magazines</Typography>
 
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
         <TextField
@@ -1974,6 +2036,7 @@ export default function ModernApp() {
   const [books, setBooks] = useState([]);
   const [authors, setAuthors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  // Step 10b: Paste magazine state here ↓
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -1993,6 +2056,7 @@ export default function ModernApp() {
 
   useEffect(() => {
     fetchData();
+    // Step 10c: Paste DAB fetch here ↓
   }, []);
 
   if (loading) {
@@ -2035,6 +2099,7 @@ export default function ModernApp() {
           <Route path="/" element={<HomePage books={books} searchTerm={searchTerm} />} />
           <Route path="/books" element={<BooksPage books={books} authors={authors} onRefresh={fetchData} />} />
           <Route path="/authors" element={<AuthorsPage authors={authors} onRefresh={fetchData} />} />
+          {/* Step 10d: Change MAGAZINES_DATA to magazines */}
           <Route path="/magazines" element={<MagazinesPage magazines={MAGAZINES_DATA} />} />
         </Routes>
       </Router>

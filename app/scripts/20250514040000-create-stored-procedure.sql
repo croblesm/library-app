@@ -1,5 +1,5 @@
 -- This script creates a stored procedure that retrieves all books along with their authors.
-CREATE PROCEDURE [dbo].[GetBooksWithAuthors]
+CREATE OR ALTER PROCEDURE [dbo].[GetBooksWithAuthors]
 AS
 BEGIN
     SELECT

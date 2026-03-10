@@ -9,7 +9,7 @@ This application is designed to run inside Dev Containers for quick setup and us
 ## Goals
 
 1. Manage a collection of books with metadata (title, year, pages, category, cover image URL)
-2. Manage authors with name fields (first, middle, last)
+2. Manage authors with name fields (first, middle, last) and optional profile photo URL
 3. Track many-to-many relationships between books and authors
 4. Provide a modern, dark-themed UI for browsing, searching, and filtering the collection
 5. Support seed data for demos and presentations
@@ -25,9 +25,9 @@ This application is designed to run inside Dev Containers for quick setup and us
 - As a user, I can sort books by title, newest first, oldest first, or most pages
 
 ### Author Management
-- As a user, I can browse all authors and see how many books each has written
+- As a user, I can browse all authors with profile photos and see how many books each has written
 - As a user, I can search authors by name
-- As a user, I can add a new author with first name, optional middle name, and last name
+- As a user, I can add a new author with first name, optional middle name, last name, and optional profile image URL
 - As a user, I can delete an author from the system
 
 ### General
@@ -79,6 +79,7 @@ authors
   first_name  NVARCHAR
   middle_name NVARCHAR (nullable)
   last_name   NVARCHAR
+  image_url   NVARCHAR (nullable)
 
 books_authors
   author_id   INT (FK -> authors.id, cascade delete)
@@ -103,8 +104,8 @@ books_authors
 
 ## Seed Data
 
-- **5 authors:** Isaac Asimov, Arthur C. Clarke, H.G. Wells, Jules Verne, Philip K. Dick
-- **24 books** across categories: Science Fiction, Classic Science Fiction, Adventure, Dystopian Science Fiction, Alternate History
+- **29 authors** including Isaac Asimov, Arthur C. Clarke, Philip K. Dick, H.G. Wells, Jules Verne, Frank Herbert, J.R.R. Tolkien, and more -- each with a Wikipedia profile photo
+- **~200 books** across 16 categories: Science Fiction, Classic Science Fiction, Hard Science Fiction, Dystopian Science Fiction, Alternate History, Adventure, Cyberpunk, Fantasy, Epic Fantasy, Techno-Thriller, Non-Fiction, Satire, Post-Apocalyptic, Military Science Fiction, Young Adult, Horror
 
 ## Non-Goals
 

@@ -191,7 +191,7 @@ cd app/backend
 npx sequelize-cli db:seed:all
 ```
 
-This populates the database with **5 authors**, **24 books**, all book-author associations, and the `GetBooksWithAuthors` stored procedure.
+This populates the database with **29 authors** (with profile photos), **~200 books**, all book-author associations, and the `GetBooksWithAuthors` stored procedure.
 
 ### 8. Start the Frontend
 
@@ -283,7 +283,7 @@ cd app/backend/ai
 python backfill_embeddings.py
 ```
 
-This generates 768-dimensional vector embeddings for all 24 books using the `nomic-embed-text` model and stores them in the `description_embedding` column.
+This generates 768-dimensional vector embeddings for all books using the `nomic-embed-text` model and stores them in the `description_embedding` column.
 
 ### 8. Start the Chat Service
 
@@ -303,6 +303,30 @@ curl -X POST http://localhost:8000/chat \
 ```
 
 The chat widget is also integrated into the React frontend (bottom-right corner).
+
+### RAG Intelligence
+
+The chat service uses smart query detection and similarity thresholds to deliver relevant results:
+
+- **Category detection**: Recognizes genre names (e.g., "science fiction", "fantasy") and common aliases ("sci-fi", "thriller")
+- **Topic-to-genre mapping**: Common topics auto-map to genres (e.g., "space exploration" → Science Fiction, "dragons" → Fantasy)
+- **Author detection**: Matches full names or last names (e.g., "Asimov", "books by Clarke")
+- **Similarity thresholds**: Category queries (0.20), author queries (0.25), general queries (0.60) — stricter for general queries to avoid irrelevant recommendations
+- **Conversational responses**: All responses use a warm, librarian tone — including fallbacks when the LLM fails or no good matches are found
+- **Latency breakdown**: The terminal logs timing for each stage (`embedding`, `sql_vector_search` in ms, `llm`, `total`)
+
+### Performance Tuning
+
+The AI service performance can be tuned via `app/backend/ai/.env`:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_NUM_PREDICT` | 150 | Max tokens to generate (lower = faster) |
+| `OLLAMA_NUM_THREAD` | 0 | CPU threads for inference (0 = auto-detect) |
+| `LLM_TEMPERATURE` | 0.1 | LLM creativity (lower = more deterministic) |
+
+> [!TIP]
+> For live demos, set `LLM_NUM_PREDICT=100` for faster responses (~3-5s). Limit SQL Server container CPU/memory to free resources for Ollama inference.
 
 ---
 
@@ -347,7 +371,7 @@ DB_CONNECTION_STRING=mssql://<your-fabric-server>.database.fabric.microsoft.com:
 | PUT | `/books/:id` | Update a book | `{ title, year, pages, image_url, category }` |
 | DELETE | `/books/:id` | Delete a book and its associations | -- |
 | GET | `/authors` | List all authors with their books | -- |
-| POST | `/authors` | Create an author | `{ first_name, middle_name, last_name }` |
+| POST | `/authors` | Create an author | `{ first_name, middle_name, last_name, image_url }` |
 | DELETE | `/authors/:id` | Delete an author | -- |
 | GET | `/books_authors` | List all book-author associations | -- |
 | POST | `/books_authors` | Create a book-author association | `{ book_id, author_id }` |
@@ -405,6 +429,7 @@ erDiagram
         nvarchar first_name
         nvarchar middle_name
         nvarchar last_name
+        nvarchar image_url
     }
 
     books_authors {
@@ -413,7 +438,7 @@ erDiagram
     }
 ```
 
-**Seed data:** 5 authors (Asimov, Clarke, Wells, Verne, Dick) and 24 books across Science Fiction, Classic Science Fiction, Adventure, Dystopian Science Fiction, and Alternate History.
+**Seed data:** 29 authors (Asimov, Clarke, Dick, Wells, Verne, Herbert, Tolkien, and more -- each with Wikipedia profile photos) and ~200 books across 16 categories including Science Fiction, Fantasy, Cyberpunk, Dystopian, Non-Fiction, and more.
 
 ---
 

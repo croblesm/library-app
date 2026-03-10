@@ -18,6 +18,10 @@ async function initAuthorModel(sequelize) {
         last_name: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        image_url: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
         tableName: 'authors',
