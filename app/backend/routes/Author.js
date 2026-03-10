@@ -4,9 +4,9 @@ const router = express.Router();
 // Create a new author
 router.post('/', async (req, res) => {
     try {
-        const { first_name, middle_name, last_name } = req.body;
+        const { first_name, middle_name, last_name, image_url } = req.body;
         const { Author } = global.models;
-        const newAuthor = await Author.create({ first_name, middle_name, last_name });
+        const newAuthor = await Author.create({ first_name, middle_name, last_name, image_url });
         res.status(201).json(newAuthor);
     } catch (error) {
         res.status(500).send(error.message);
@@ -59,5 +59,4 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-module.exports = router;
 module.exports = router;

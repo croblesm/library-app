@@ -26,6 +26,7 @@ Prerequisites:
 
 import os
 import re
+import time
 import logging
 from contextlib import asynccontextmanager
 from typing import List, Dict, Optional, Tuple
@@ -47,6 +48,8 @@ OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
 EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'nomic-embed-text')
 LLM_MODEL = os.getenv('LLM_MODEL', 'llama3.2:3b')
 LLM_TEMPERATURE = float(os.getenv('LLM_TEMPERATURE', '0.1'))
+LLM_NUM_PREDICT = int(os.getenv('LLM_NUM_PREDICT', '100'))  # Max tokens to generate (lower = faster)
+OLLAMA_NUM_THREAD = int(os.getenv('OLLAMA_NUM_THREAD', '0'))  # 0 = auto-detect CPU cores
 CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3001,http://127.0.0.1:3001').split(',')
 
 @asynccontextmanager
@@ -84,28 +87,13 @@ known_authors = []  # Populated from database at startup
 
 # System prompt for the librarian agent
 # This defines the role, behavior, and constraints to prevent hallucination
-LIBRARIAN_SYSTEM_PROMPT = """You are a knowledgeable and friendly librarian AI assistant helping patrons find books to read.
+LIBRARIAN_SYSTEM_PROMPT = """You are a friendly librarian. Recommend books ONLY from the list below.
 
-Your role:
-- Provide warm, conversational book recommendations based on user interests
-- Suggest books from the library's collection that match the user's preferences
-- Explain why each book is a good match for their interests
-- Help users discover books they might enjoy
-
-CRITICAL CONSTRAINTS (Must follow STRICTLY - these are non-negotiable):
-1. ONLY recommend books that are explicitly listed below with their titles
-2. NEVER make up, invent, or hallucinate any books not in the list
-3. NEVER recommend books under a different title than what's in the list
-4. NEVER invent book details (authors, plots, characters) that aren't provided
-5. If you recommend a book, use EXACTLY the title and year from the list
-6. Maximum 2-3 books per recommendation
-7. Keep responses brief and conversational (100 words max)
-8. If no good matches exist, say so honestly
-
-Important reminders:
-- It's better to recommend only 1 book accurately than 3 hallucinated ones
-- Users trust librarians to be accurate, not creative
-- Check that every book you mention is in the list before writing your response"""
+Rules:
+- Use EXACT titles from the list. NEVER invent books.
+- Recommend 1-2 books max. Keep response under 50 words.
+- Be warm and conversational.
+- If NONE of the books match what the user is asking for, say so honestly and suggest they try a different topic."""
 
 # Request/Response models for API
 class Message(BaseModel):
@@ -191,8 +179,7 @@ def initialize_embedding_model():
     # Model produces 768-dimensional vectors
     embeddings = OllamaEmbeddings(
         model=EMBEDDING_MODEL,
-        base_url=OLLAMA_BASE_URL,
-        request_timeout=30
+        base_url=OLLAMA_BASE_URL
     )
 
     print("✅ Embedding model loaded")
@@ -285,14 +272,17 @@ def initialize_llm_model():
     # Initialize Ollama LLM for natural language generation
     # Ollama must be running: ollama serve
     # Using low temperature (0.1) to reduce hallucinations and keep responses focused
-    llm = OllamaLLM(
-        model=LLM_MODEL,
-        base_url=OLLAMA_BASE_URL,
-        temperature=LLM_TEMPERATURE,
-        request_timeout=60
-    )
+    llm_kwargs = {
+        "model": LLM_MODEL,
+        "base_url": OLLAMA_BASE_URL,
+        "temperature": LLM_TEMPERATURE,
+        "num_predict": LLM_NUM_PREDICT,
+    }
+    if OLLAMA_NUM_THREAD > 0:
+        llm_kwargs["num_thread"] = OLLAMA_NUM_THREAD
+    llm = OllamaLLM(**llm_kwargs)
 
-    print("✅ LLM model loaded")
+    print(f"✅ LLM model loaded (num_predict={LLM_NUM_PREDICT}, num_thread={'auto' if OLLAMA_NUM_THREAD == 0 else OLLAMA_NUM_THREAD})")
     return llm
 
 def detect_category(question: str) -> str:
@@ -320,6 +310,24 @@ def detect_category(question: str) -> str:
         "classic scifi": "Classic Science Fiction",
         "alt history": "Alternate History",
         "alternative history": "Alternate History",
+        "thriller": "Techno-Thriller",
+        "techno thriller": "Techno-Thriller",
+        "suspense": "Techno-Thriller",
+        # Topic-to-genre mappings (common topics that imply a genre)
+        "space": "Science Fiction",
+        "aliens": "Science Fiction",
+        "robots": "Science Fiction",
+        "artificial intelligence": "Science Fiction",
+        "time travel": "Science Fiction",
+        "mars": "Science Fiction",
+        "moon": "Science Fiction",
+        "galaxy": "Science Fiction",
+        "spaceship": "Science Fiction",
+        "apocalypse": "Post-Apocalyptic",
+        "end of the world": "Post-Apocalyptic",
+        "zombie": "Horror",
+        "dragon": "Fantasy",
+        "magic": "Fantasy",
     }
 
     # First check aliases
@@ -333,11 +341,11 @@ def detect_category(question: str) -> str:
             return category
 
     # Check for partial/keyword matches if no exact match
+    # Require whole-word match to avoid false positives (e.g., "thriller" matching "Techno-Thriller")
     for category in known_categories:
-        # Split category into words and check if any word matches
         category_words = category.lower().split()
         for word in category_words:
-            if len(word) > 3 and word in question_lower:  # Skip short words
+            if len(word) > 4 and re.search(r'\b' + re.escape(word) + r'\b', question_lower):
                 return category
 
     return None
@@ -638,12 +646,11 @@ def create_safe_prompt(question: str, retrieved_books: List[Dict], conversation_
     # Keep it simple for TinyLlama but include critical constraints
     prompt = f"""{LIBRARIAN_SYSTEM_PROMPT}
 
-AVAILABLE BOOKS IN OUR COLLECTION:
+BOOKS:
 {books_list}
 
-USER QUESTION: {question}
-
-Respond conversationally in 2-3 sentences. Recommend 1-2 books from the list above that best match the user's interests. Use EXACT titles from the list."""
+Q: {question}
+A:"""
 
     return prompt
 
@@ -683,29 +690,35 @@ def generate_response_with_rag(question: str, retrieved_books: List[Dict], conve
 
     # CRITICAL: Apply similarity threshold to ensure quality recommendations
     # Priority: category > author > general
+    # Note: With ~200 books, embedding scores tend to be lower than with small datasets
     if detected_cat:
-        # User asked for a specific category - use most lenient threshold
-        SIMILARITY_THRESHOLD = 0.30
+        # User asked for a specific category - most lenient (category filter already narrows results)
+        SIMILARITY_THRESHOLD = 0.20
         print(f"📚 Category detected: {detected_cat} - using threshold {SIMILARITY_THRESHOLD}")
         quality_books = [book for book in retrieved_books if book['similarity_score'] >= SIMILARITY_THRESHOLD]
     elif detected_author:
-        # User asked for a specific author - use lenient but stricter than category
-        SIMILARITY_THRESHOLD = 0.35
+        # User asked for a specific author - lenient (author filter already narrows results)
+        SIMILARITY_THRESHOLD = 0.25
         print(f"✍️  Author detected: {detected_author} - using threshold {SIMILARITY_THRESHOLD}")
         quality_books = [book for book in retrieved_books if book['similarity_score'] >= SIMILARITY_THRESHOLD]
     else:
-        # General query - use stricter threshold
-        SIMILARITY_THRESHOLD = 0.50
+        # General query - strict threshold to avoid recommending irrelevant books
+        SIMILARITY_THRESHOLD = 0.60
         print(f"🔍 General query - using threshold {SIMILARITY_THRESHOLD}")
         quality_books = [book for book in retrieved_books if book['similarity_score'] >= SIMILARITY_THRESHOLD]
 
     # Check if we have any quality matches
     best_score = max(book['similarity_score'] for book in retrieved_books) if retrieved_books else 0
 
+    # Log top scores for debugging
+    top_3 = sorted(retrieved_books, key=lambda b: b['similarity_score'], reverse=True)[:3]
+    for b in top_3:
+        print(f"   📊 {b['title']}: {b['similarity_score']:.4f} {'✅' if b['similarity_score'] >= SIMILARITY_THRESHOLD else '❌'}")
+
     if not quality_books:
         # No books meet the quality threshold
         categories_list = ", ".join(known_categories) if known_categories else "Science Fiction and Adventure"
-        return f"I'm sorry, but our library specializes in {categories_list} books. We don't appear to have books matching your specific request. Would you like me to recommend something from our collection instead? Just ask for any of our genres!"
+        return f"Hmm, I don't think we have books on that specific topic. Our collection focuses on {categories_list}. Would you like me to recommend something from one of those genres?"
 
     # BUG FIX: Commented out lines 485-488 (deadzone bug)
     #
@@ -751,11 +764,22 @@ def generate_response_with_rag(question: str, retrieved_books: List[Dict], conve
 
     except Exception as e:
         print(f"❌ Error generating LLM response: {e}")
-        # Fallback: return safe list if LLM fails
-        fallback = f"Based on your search for '{question}', here are some recommendations from our collection:\n\n"
-        for i, book in enumerate(quality_books[:3], 1):
-            fallback += f"{i}. **{book['title']}** by {book.get('author', 'Unknown')} ({book['year']}) - {book['category']}\n"
-        return fallback.strip()
+        return _conversational_fallback(quality_books)
+
+def _conversational_fallback(books: List[Dict]) -> str:
+    """Generate a conversational fallback response matching the LLM's warm tone."""
+    if not books:
+        return "I couldn't find a strong match for that in our collection. Could you try rephrasing or ask about a different genre?"
+
+    if len(books) == 1:
+        b = books[0]
+        return f"Great question! I'd recommend **{b['title']}** by {b.get('author', 'Unknown')} ({b['year']}). It's a wonderful {b['category'].lower()} read!"
+
+    # 2+ books — mention up to 2 conversationally
+    top = books[:2]
+    parts = [f"**{b['title']}** by {b.get('author', 'Unknown')} ({b['year']})" for b in top]
+    return f"Great question! I'd suggest {parts[0]} and {parts[1]}. Both are excellent reads from our collection!"
+
 
 def validate_and_fix_response(response: str, retrieved_books: List[Dict]) -> str:
     """
@@ -797,10 +821,7 @@ def validate_and_fix_response(response: str, retrieved_books: List[Dict]) -> str
     # it's a contradiction - the LLM is confused
     if has_negative and has_real_books:
         print("⚠️  Warning: Contradictory response detected (negative + book mentions) - using fallback")
-        fallback = "Here are some great books from our collection that match your interests:\n\n"
-        for i, book in enumerate(retrieved_books, 1):
-            fallback += f"{i}. **{book['title']}** by {book.get('author', 'Unknown')} ({book['year']}) - {book['category']}\n"
-        return fallback
+        return _conversational_fallback(retrieved_books)
 
     if has_real_books:
         # Response mentions real books and no contradictions - it's safe
@@ -809,10 +830,7 @@ def validate_and_fix_response(response: str, retrieved_books: List[Dict]) -> str
     else:
         # Response doesn't mention any real books - likely hallucination
         print("⚠️  Warning: Response doesn't reference retrieved books - using fallback")
-        fallback = "Here are some great books from our collection that match your interests:\n\n"
-        for i, book in enumerate(retrieved_books, 1):
-            fallback += f"{i}. **{book['title']}** by {book.get('author', 'Unknown')} ({book['year']}) - {book['category']}\n"
-        return fallback
+        return _conversational_fallback(retrieved_books)
 
 @app.get("/")
 async def root():
@@ -877,30 +895,35 @@ async def chat(request: ChatRequest):
         }
     """
     try:
+        t_start = time.time()
+
         # Step 1: Detect if user is asking ONLY for a specific category
         # We only filter by category if the query seems purely category-focused
         print(f"📝 Question: {request.question}")
         detected_category = detect_category(request.question)
-        
+
         # Only apply category filter for simple category-only queries
         # Don't filter if query mentions authors, years, specific titles, etc.
         question_lower = request.question.lower()
         is_category_only_query = detected_category and not any(word in question_lower for word in [
-            "author", "by", "from", "written", "year", "1800", "1900", "19", "20", 
+            "author", "by", "from", "written", "year", "1800", "1900", "19", "20",
         ])
-        
+
         category_filter = detected_category if is_category_only_query else None
-        
+
         if category_filter:
             print(f"🏷️  Filtering by category: {category_filter}")
         elif detected_category:
             print(f"🏷️  Detected category '{detected_category}' but not filtering (complex query)")
-        
+
         # Step 2: Generate embedding for the question
+        t_embed_start = time.time()
         query_embedding = generate_query_embedding(request.question)
-        print(f"✅ Generated embedding vector ({len(query_embedding)} dimensions)")
+        t_embed = time.time() - t_embed_start
+        print(f"✅ Generated embedding vector ({len(query_embedding)} dimensions) [{t_embed:.2f}s]")
 
         # Step 3: Connect to database and search for similar books (Retrieval)
+        t_search_start = time.time()
         conn = get_connection()
         cursor = conn.cursor()
 
@@ -929,14 +952,16 @@ async def chat(request: ChatRequest):
 
         cursor.close()
         conn.close()
-
-        print(f"✅ Found {len(results)} matching books")
+        t_search = time.time() - t_search_start
+        print(f"✅ Found {len(results)} matching books [{t_search:.2f}s]")
 
         # Step 4: Generate natural language response using RAG (Generation)
+        t_llm_start = time.time()
         print("💭 Generating conversational response...")
         # Convert conversation history to dict format
         history = [{"role": msg.role, "content": msg.content} for msg in request.conversation_history] if request.conversation_history else []
         natural_response = generate_response_with_rag(request.question, results, history)
+        t_llm = time.time() - t_llm_start
 
         # Step 5: Apply similarity threshold to results returned to user
         # Only show books that meet the quality threshold to prevent showing irrelevant results
@@ -944,16 +969,19 @@ async def chat(request: ChatRequest):
         # Note: detected_author already computed in Step 3
 
         if detected_category:
-            SIMILARITY_THRESHOLD = 0.30  # Most lenient for category queries
+            SIMILARITY_THRESHOLD = 0.20  # Most lenient for category queries
         elif detected_author:
-            SIMILARITY_THRESHOLD = 0.35  # Lenient for author queries
+            SIMILARITY_THRESHOLD = 0.25  # Lenient for author queries
         else:
-            SIMILARITY_THRESHOLD = 0.50  # Stricter for general queries
+            SIMILARITY_THRESHOLD = 0.40  # Moderate for general queries
 
         quality_results = [book for book in results if book['similarity_score'] >= SIMILARITY_THRESHOLD]
 
         # If no quality matches, return empty results (message explains why in the response)
         final_results = quality_results if quality_results else []
+
+        t_total = time.time() - t_start
+        print(f"⏱️  Latency breakdown: embedding={t_embed:.2f}s | sql_vector_search={t_search*1000:.0f}ms | llm={t_llm:.2f}s | total={t_total:.2f}s")
 
         # Step 6: Return complete response with both natural language and structured data
         return ChatResponse(
@@ -1003,7 +1031,8 @@ if __name__ == "__main__":
     print("📚 Docs: http://localhost:8000/docs")
     print("🤖 Models:")
     print(f"   - Embeddings: {EMBEDDING_MODEL} (768-dim)")
-    print(f"   - LLM: {LLM_MODEL} (natural language generation)")
+    print(f"   - LLM: {LLM_MODEL} (temp={LLM_TEMPERATURE}, max_tokens={LLM_NUM_PREDICT})")
+    print(f"⚡ Performance: num_thread={'auto' if OLLAMA_NUM_THREAD == 0 else OLLAMA_NUM_THREAD}")
     print("📋 Pattern: RAG (Retrieval-Augmented Generation)")
     print("🛡️  Guardrails: System prompt prevents hallucination")
     print("=" * 60)

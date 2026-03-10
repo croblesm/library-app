@@ -194,22 +194,28 @@ Ensure that the foreign key columns align with the current database schema for b
 
 <div class="card">
     <h3>Step 10: Wire the Frontend to the DAB Endpoint</h3>
-    <p class="voiceover">"Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Let me show the quick change in ModernApp.js."</p>
-    <p><em>Show: In ModernApp.js, replace the <code>MAGAZINES_DATA</code> constant with an API call to the DAB endpoint. The MagazinesPage component already supports receiving data as a prop.</em></p>
-    <pre id="code5">// Before: hardcoded data
-const MAGAZINES_DATA = [
-  { id: 1, title: "Tech Monthly", ... },
-  ...
-];
+    <p class="voiceover">"Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Three quick changes in ModernApp.js."</p>
+    <p><em>Make three changes in <code>ModernApp.js</code>:</em></p>
 
-// After: fetch from DAB endpoint
-const [magazines, setMagazines] = useState([]);
-useEffect(() => {
-  axios.get('http://localhost:5000/api/magazines')
-    .then(res => setMagazines(res.data.value))
-    .catch(err => console.error(err));
-}, []);</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
+    <p><strong>Change 1:</strong> Comment out the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
+    <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array and comment it out with <code>Ctrl+/</code>.</em></p>
+
+    <p><strong>Change 2:</strong> Inside the <code>ModernApp()</function</code>, add a new state variable and fetch call. Paste the following right after the existing <code>useState</code> declarations (around line 1977):</p>
+    <pre id="code5a">const [magazines, setMagazines] = useState([]);</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code5a')">Copy</button>
+
+    <p>Then add the DAB fetch inside the existing <code>useEffect</code> block, right after <code>fetchData();</code> (around line 1997):</p>
+    <pre id="code5b">    axios.get('http://localhost:5000/api/magazines')
+      .then(res => setMagazines(res.data.value))
+      .catch(err => console.error(err));</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code5b')">Copy</button>
+
+    <p><strong>Change 3:</strong> Update the route to use the new state variable instead of <code>MAGAZINES_DATA</code> (around line 2042). Change:</p>
+    <pre id="code5c">&lt;MagazinesPage magazines={MAGAZINES_DATA} /&gt;</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code5c')">Copy</button>
+    <p>To:</p>
+    <pre id="code5d">&lt;MagazinesPage magazines={magazines} /&gt;</pre>
+    <button class="copy-btn" onclick="copyToClipboard('code5d')">Copy</button>
 </div>
 
 <div class="card">

@@ -41,7 +41,7 @@ app/backend/routes/           Express route handlers
   Book.js                     /books endpoints
   Author.js                   /authors endpoints
   BooksAuthors.js             /books_authors endpoints
-app/backend/seeders/          Sequelize seeders (5 authors, 24 books)
+app/backend/seeders/          Sequelize seeders (29 authors, 194 books)
 app/backend/scripts/          Utility scripts (dropAllTables.js, SQL files)
 app/frontend/library-frontend/  React SPA
   src/ModernApp.js            Main component (all UI in one file)
@@ -68,6 +68,10 @@ infrastructure/               Terraform for Microsoft Fabric provisioning
 - Embedding text format: `"Book: {title}, Author: {author}, Category: {category}, Year: {year}"`
 - RAG pattern: embed user question -> vector similarity search in SQL Server -> format context -> LLM generates response
 - Hallucination guardrails: system prompt + response validation + low temperature (configurable via LLM_TEMPERATURE env var)
+- RAG similarity thresholds: category queries 0.20, author queries 0.25, general queries 0.60
+- Topic-to-category aliases: common topics (space, robots, aliens, time travel, etc.) auto-map to genres
+- Conversational fallbacks: all fallback paths produce warm, natural responses (no numbered lists)
+- Latency logging: `embedding` and `llm` in seconds, `sql_vector_search` in milliseconds
 - Frontend pages: Home (/), Books (/books), Authors (/authors), Magazines (/magazines -- hardcoded data for demo)
 
 ## Environment Files
@@ -103,6 +107,8 @@ MSSQL_CONNECTION_STRING=Server=<your-server>;Database=<your-database>;UID=<your-
 # EMBEDDING_MODEL=nomic-embed-text
 # LLM_MODEL=llama3.2:3b
 # LLM_TEMPERATURE=0.1
+# LLM_NUM_PREDICT=150
+# OLLAMA_NUM_THREAD=0
 # CORS_ORIGINS=http://localhost:3001,http://127.0.0.1:3001
 ```
 
@@ -114,7 +120,7 @@ Note: The Python service uses ADO.NET-style connection strings with `UID`/`PWD`,
 # Backend
 cd app/backend && npm install
 cd app/backend && npm start                       # Port 3000
-cd app/backend && npx sequelize-cli db:seed:all   # Seed 5 authors + 24 books
+cd app/backend && npx sequelize-cli db:seed:all   # Seed 29 authors + 194 books
 
 # Frontend
 cd app/frontend/library-frontend && npm install
@@ -142,7 +148,7 @@ cd app/backend && node ./scripts/dropAllTables.js
 | PUT | /books/:id | Update book | { title, year, pages, image_url, category } |
 | DELETE | /books/:id | Delete book + associations | -- |
 | GET | /authors | List authors with books | -- |
-| POST | /authors | Create author | { first_name, middle_name, last_name } |
+| POST | /authors | Create author | { first_name, middle_name, last_name, image_url } |
 | DELETE | /authors/:id | Delete author | -- |
 | GET | /books_authors | List all associations | -- |
 | POST | /books_authors | Create association | { book_id, author_id } |
@@ -174,6 +180,7 @@ authors
   first_name (NVARCHAR)
   middle_name (NVARCHAR, nullable)
   last_name (NVARCHAR)
+  image_url (NVARCHAR, nullable)
 
 books_authors
   author_id (FK -> authors.id, cascade)
@@ -183,8 +190,8 @@ books_authors
 
 ## Seed Data
 
-5 authors: Isaac Asimov, Arthur C. Clarke, H.G. Wells, Jules Verne, Philip K. Dick
-24 books across categories: Science Fiction, Classic Science Fiction, Adventure, Dystopian Science Fiction, Alternate History
+29 authors including: Isaac Asimov, Arthur C. Clarke, Philip K. Dick, H.G. Wells, Jules Verne, Frank Herbert, J.R.R. Tolkien, Orson Scott Card, Robert A. Heinlein, Ernest Cline, Andy Weir, Michael Crichton, Yuval Noah Harari, Ray Bradbury, Ursula K. Le Guin, Kurt Vonnegut, George Orwell, Aldous Huxley, Douglas Adams, William Gibson, Neal Stephenson, Stanislaw Lem, Margaret Atwood, Octavia Butler, Brandon Sanderson, Terry Pratchett, Suzanne Collins, Cixin Liu, Patrick Rothfuss
+194 books across categories: Science Fiction, Classic Science Fiction, Hard Science Fiction, Dystopian Science Fiction, Alternate History, Adventure, Cyberpunk, Fantasy, Epic Fantasy, Techno-Thriller, Non-Fiction, Satire, Post-Apocalyptic, Military Science Fiction, Young Adult, Horror
 
 ## Cross-Platform AI Agent Instructions
 

@@ -172,7 +172,7 @@ ON books(description_embedding);</pre>
     <p class="voiceover">"Now that we've added the VECTOR column and index to our schema, it's time to populate it with embeddings. I've already prepared a Python script that will generate embeddings for all our books using Ollama. Let me run it now."</p>
     <pre id="code6">python app/backend/ai/backfill_embeddings.py</pre>
     <button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button>
-    <p class="voiceover">"The script connects to SQL Server, reads all books from our database, generates 768-dimensional vector embeddings using Ollama's nomic-embed-text model, and populates the new VECTOR column. This should only take a few seconds for our 24 books."</p>
+    <p class="voiceover">"The script connects to SQL Server, reads all books from our database, generates 768-dimensional vector embeddings using Ollama's nomic-embed-text model, and populates the new VECTOR column. This should only take a moment for our ~200 books."</p>
 </div>
 
 <div class="card">

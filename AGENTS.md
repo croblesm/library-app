@@ -78,7 +78,7 @@ library-app/
 │   │   │   └── .env                    # Backend credentials (git-ignored)
 │   │   ├── models/                     # Sequelize ORM models
 │   │   ├── routes/                     # Express route handlers
-│   │   ├── seeders/                    # Sequelize seeders (5 authors, 24 books)
+│   │   ├── seeders/                    # Sequelize seeders (29 authors, ~200 books)
 │   │   ├── scripts/                    # Utility scripts
 │   │   ├── index.js                    # Express entry point
 │   │   └── package.json
@@ -113,6 +113,7 @@ authors
   first_name (NVARCHAR)
   middle_name (NVARCHAR, nullable)
   last_name (NVARCHAR)
+  image_url (NVARCHAR, nullable)
 
 books_authors
   author_id (FK -> authors.id, cascade)
@@ -129,7 +130,7 @@ books_authors
 cd app/backend && npm install
 cd app/backend && npm start                       # Port 3000
 cd app/backend && npx sequelize-cli db:create     # Create database
-cd app/backend && npx sequelize-cli db:seed:all   # Seed 5 authors + 24 books
+cd app/backend && npx sequelize-cli db:seed:all   # Seed 29 authors + ~200 books
 
 # Frontend
 cd app/frontend/library-frontend && npm install
