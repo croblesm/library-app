@@ -39,11 +39,6 @@
             float: right;
             margin-top: 0.5rem;
         }
-        .voiceover {
-            font-style: italic;
-            margin: 0.5rem 0 1rem;
-            color: #555;
-        }
         code {
             background-color: #e9ecef;
             padding: 0.2rem 0.4rem;
@@ -51,60 +46,59 @@
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9rem;
         }
-        .theme-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 2rem;
-            background: #4f46e5;
-            color: white;
-            padding: 0.4rem 1rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        body.dark {
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-        }
-
-        body.dark .card {
-            background-color: #2e2e2e;
-            border-left-color: #90cdf4;
-        }
-
-        body.dark h1, body.dark h2, body.dark h3 {
-            color: #ffffff;
-        }
-
-        body.dark .copy-btn {
-            background-color: #90cdf4;
-            color: black;
-        }
-
-        body.dark pre {
-            background-color: #111;
-            color: #eee;
-        }
-
-        body.dark code {
-            background-color: #333;
-            color: #90cdf4;
-        }
-
-        body.dark .voiceover {
-            color: #aaa;
-        }
-
-        body.dark #toast {
-            background-color: #555;
-        }
     </style>
 </head>
 <body>
 
-<button class="theme-toggle" onclick="toggleTheme()">Theme</button>
+<style>
+    .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 2rem;
+        background: #4f46e5;
+        color: white;
+        padding: 0.4rem 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    body.dark {
+        background-color: #1e1e1e;
+        color: #f0f0f0;
+    }
+
+    body.dark .card {
+        background-color: #2e2e2e;
+        border-left-color: #90cdf4;
+    }
+
+    body.dark h1, body.dark h2, body.dark h3 {
+        color: #ffffff;
+    }
+
+    body.dark .copy-btn {
+        background-color: #90cdf4;
+        color: black;
+    }
+
+    body.dark pre {
+        background-color: #111;
+        color: #eee;
+    }
+
+    body.dark code {
+        background-color: #333;
+        color: #90cdf4;
+    }
+
+    body.dark #toast {
+        background-color: #555;
+    }
+</style>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
 
 <script>
     function toggleTheme() {
@@ -113,124 +107,125 @@
 </script>
 
 <h1>Schema Designer + GitHub Copilot Demo</h1>
+<p><em>Duration: ~15 minutes</em></p>
 
-<h2>Scenario Introduction</h2>
+<h2>🎬 Scenario Introduction</h2>
 <p>I'm a developer working on a Library management app built with Node.js, Sequelize, and React. I've been asked to add a new feature to manage <strong>magazines</strong>. The frontend already has a Magazines page showing hardcoded data, and my task is to create the backend infrastructure: the database table, relationships, test data, and a REST API endpoint.</p>
 <p>Instead of writing SQL by hand, I'll use the <strong>Schema Designer</strong> in the MSSQL extension for VS Code, with <strong>GitHub Copilot</strong> integrated directly into the visual editor. Then I'll use <strong>Data API Builder (DAB)</strong> to expose the new table as a REST API in seconds.</p>
 
-<div class="card">
-    <h3>Step 1: Show the App with Hardcoded Magazines</h3>
-    <p class="voiceover">"Let me start by showing you the app. We already have a Books page and an Authors page. Recently, I added a Magazines page, but right now it's using hardcoded data in the React frontend. My goal is to create the real database table and wire it up."</p>
-    <p><em>Show: Open the frontend at <code>http://localhost:3001/magazines</code> and browse the 5 hardcoded magazine cards.</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 1. Show the App with Hardcoded Magazines</h3>
+        <p><em>🎤 Voiceover:</em> "Let me start by showing you the app. We already have a Books page and an Authors page. Recently, I added a Magazines page, but right now it's using hardcoded data in the React frontend. My goal is to create the real database table and wire it up."</p>
+        <p><em>Show: Open the frontend at <code>http://localhost:3001/magazines</code> and browse the 5 hardcoded magazine cards.</em></p>
+    </div>
 
-<div class="card">
-    <h3>Step 2: Open Schema Designer</h3>
-    <p class="voiceover">"Now let's create the actual table. I'll open the Schema Designer from the MSSQL extension. This gives me a visual editor where I can design tables, add columns, and define relationships -- all without writing a single line of SQL."</p>
-    <p><em>Show: Right-click the database in Object Explorer > Open Schema Designer. Show the existing tables (books, authors, books_authors) in the visual view.</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 2. Open Schema Designer</h3>
+        <p><em>🎤 Voiceover:</em> "Now let's create the actual table. I'll open the Schema Designer from the MSSQL extension. This gives me a visual editor where I can design tables, add columns, and define relationships -- all without writing a single line of SQL."</p>
+        <p><em>Show: Right-click the database in Object Explorer > Open Schema Designer. Show the existing tables (books, authors, books_authors) in the visual view.</em></p>
+    </div>
 
-<div class="card">
-    <h3>Step 3: Use GitHub Copilot to Create the Magazines Table</h3>
-    <p class="voiceover">"Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask GitHub Copilot to create the table from that selection."</p>
-    <p><em>Show: Open <code>ModernApp.js</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
-    <pre id="code1">using the selected JSON structure, create a new table called Magazines</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
-    <p class="voiceover">"This is the key moment -- GitHub Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
-</div>
+    <div class="card">
+        <h3>🔹 3. Use GitHub Copilot to Create the Magazines Table</h3>
+        <p><em>🎤 Voiceover:</em> "Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask GitHub Copilot to create the table from that selection."</p>
+        <p><em>Show: Open <code>ModernApp.js</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
+        <pre id="code1">using the selected JSON structure, create a new table called Magazines</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "This is the key moment -- GitHub Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
+    </div>
 
-<div class="card">
-    <h3>Step 4: Review Changes in the Visual Editor</h3>
-    <p class="voiceover">"The Schema Designer shows me a visual diff of what's about to change. I can see the new magazines table with all its columns, data types, and constraints. I'm in full control -- I can adjust anything before committing."</p>
-    <p><em>Show: The "Copilot Changes" tab at the bottom showing "Added Table: [dbo].[magazines]" with Accept/Undo options. Click through the columns to verify: id (INT, PK, Identity), title (NVARCHAR), issue (INT), year (INT), category (NVARCHAR).</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 4. Review Changes in the Visual Editor</h3>
+        <p><em>🎤 Voiceover:</em> "The Schema Designer shows me a visual diff of what's about to change. I can see the new magazines table with all its columns, data types, and constraints. I'm in full control -- I can adjust anything before committing."</p>
+        <p><em>Show: The "Copilot Changes" tab at the bottom showing "Added Table: [dbo].[magazines]" with Accept/Undo options. Click through the columns to verify: id (INT, PK, Identity), title (NVARCHAR), issue (INT), year (INT), category (NVARCHAR).</em></p>
+    </div>
 
-<div class="card">
-    <h3>Step 5: Publish Changes to Database</h3>
-    <p class="voiceover">"Everything looks good. Now I'll click Publish to apply these changes to the actual database. The Schema Designer generates and executes the DDL statement for me."</p>
-    <p><em>Show: Click "Publish Changes" button. Show the confirmation and the table appearing in Object Explorer.</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 5. Publish Changes to Database</h3>
+        <p><em>🎤 Voiceover:</em> "Everything looks good. Now I'll click Publish to apply these changes to the actual database. The Schema Designer generates and executes the DDL statement for me."</p>
+        <p><em>Show: Click "Publish Changes" button. Show the confirmation and the table appearing in Object Explorer.</em></p>
+    </div>
 
-<div class="card">
-    <h3>Step 6: Add a Many-to-Many Relationship with Authors</h3>
-    <p class="voiceover">"Magazines can also have authors, just like books do. Let me ask GitHub Copilot to create the junction table for this many-to-many relationship."</p>
-    <pre id="code2">Add a many-to-many relationship between this new magazines table and the existing authors table.
+    <div class="card">
+        <h3>🔹 6. Add a Many-to-Many Relationship with Authors</h3>
+        <p><em>🎤 Voiceover:</em> "Magazines can also have authors, just like books do. Let me ask GitHub Copilot to create the junction table for this many-to-many relationship."</p>
+        <pre id="code2">Add a many-to-many relationship between this new magazines table and the existing authors table.
 Ensure that the foreign key columns align with the current database schema for both tables, using the correct primary key columns as defined in the existing structure.</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
-    <p class="voiceover">"GitHub Copilot creates a magazines_authors junction table with the correct foreign keys pointing to both tables. Let me review and publish this change too."</p>
-</div>
+        <button class="copy-btn" onclick="copyToClipboard('code2')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "GitHub Copilot creates a magazines_authors junction table with the correct foreign keys pointing to both tables. Let me review and publish this change too."</p>
+    </div>
 
-<div class="card">
-    <h3>Step 7: Generate Science-Themed Test Data</h3>
-    <p class="voiceover">"Now I need some test data. Instead of writing it by hand, I'll ask GitHub Copilot to generate realistic mockup data for our new table."</p>
-    <pre id="code3">Generate mockup data for the magazines table.
+    <div class="card">
+        <h3>🔹 7. Generate Science-Themed Test Data</h3>
+        <p><em>🎤 Voiceover:</em> "Now I need some test data. Instead of writing it by hand, I'll ask GitHub Copilot to generate realistic mockup data for our new table."</p>
+        <pre id="code3">Generate mockup data for the magazines table.
 - Each magazine should be themed around science or technology (e.g., astronomy, physics, biology, robotics).
 - Include at least 5 magazines with creative titles, different issues, and years.
 - Also link each magazine to one or more existing authors in the authors table using the junction table.</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
-    <p class="voiceover">"Before running anything, let me review what GitHub Copilot generated. I can see the SQL script it created -- let me inspect it to make sure the data looks right and the foreign keys match our schema."</p>
-    <p><em>Show: Review the generated SQL script. Once satisfied, execute it.</em></p>
-    <p class="voiceover">"Looks good. Now let me verify the data actually landed in the database."</p>
-    <pre id="code3b">Show me all the data in the magazines table and their linked authors</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code3b')">Copy</button>
-    <p class="voiceover">"There it is -- GitHub Copilot wrote the query, and I can see the mockup data with the author relationships. Everything checks out."</p>
-</div>
+        <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "Before running anything, let me review what GitHub Copilot generated. I can see the SQL script it created -- let me inspect it to make sure the data looks right and the foreign keys match our schema."</p>
+        <p><em>Show: Review the generated SQL script. Once satisfied, execute it.</em></p>
+        <p><em>🎤 Voiceover:</em> "Looks good. Now let me verify the data actually landed in the database."</p>
+        <pre id="code3b">Show me all the data in the magazines table and their linked authors</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code3b')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "There it is -- GitHub Copilot wrote the query, and I can see the mockup data with the author relationships. Everything checks out."</p>
+    </div>
 
-<div class="card">
-    <h3>Step 8: Open Data API Builder</h3>
-    <p class="voiceover">"Now for the final piece -- I need a REST API for the frontend to call. Instead of writing Express routes and Sequelize models, I'll use Data API Builder to create an endpoint in seconds. DAB reads my database schema and exposes it as a REST API automatically."</p>
-    <p><em>Show: Open the Data API Builder configuration from the MSSQL extension. Notice it picked up all 5 entities from the dbo schema: authors, books_authors, magazines_authors, books, and magazines -- all with full CRUD enabled.</em></p>
-    <p class="voiceover">"DAB automatically detected all the tables in my schema. But I only need the magazines endpoint for now, and I want it read-only. Let me ask GitHub Copilot to clean this up."</p>
-</div>
+    <div class="card">
+        <h3>🔹 8. Open Data API Builder</h3>
+        <p><em>🎤 Voiceover:</em> "Now for the final piece -- I need a REST API for the frontend to call. Instead of writing Express routes and Sequelize models, I'll use Data API Builder to create an endpoint in seconds. DAB reads my database schema and exposes it as a REST API automatically."</p>
+        <p><em>Show: Open the Data API Builder configuration from the MSSQL extension. Notice it picked up all 5 entities from the dbo schema: authors, books_authors, magazines_authors, books, and magazines -- all with full CRUD enabled.</em></p>
+        <p><em>🎤 Voiceover:</em> "DAB automatically detected all the tables in my schema. But I only need the magazines endpoint for now, and I want it read-only. Let me ask GitHub Copilot to clean this up."</p>
+    </div>
 
-<div class="card">
-    <h3>Step 9: Configure the API with GitHub Copilot</h3>
-    <p class="voiceover">"Instead of manually unchecking entities and toggling permissions one by one, I'll ask GitHub Copilot to do it for me."</p>
-    <pre id="code4">Remove all entities from the dbo schema and keep only the magazines entity. Make it a read-only endpoint -- I only need the Read permission enabled.</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
-    <p class="voiceover">"Done -- GitHub Copilot removed the other entities and set magazines to read-only. Now I just need to deploy it."</p>
-    <p><em>Show: The DAB configuration now shows only the magazines entity with only the Read checkbox enabled. Click Deploy.</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 9. Configure the API with GitHub Copilot</h3>
+        <p><em>🎤 Voiceover:</em> "Instead of manually unchecking entities and toggling permissions one by one, I'll ask GitHub Copilot to do it for me."</p>
+        <pre id="code4">Remove all entities from the dbo schema and keep only the magazines entity. Make it a read-only endpoint -- I only need the Read permission enabled.</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "Done -- GitHub Copilot removed the other entities and set magazines to read-only. Now I just need to deploy it."</p>
+        <p><em>Show: The DAB configuration now shows only the magazines entity with only the Read checkbox enabled. Click Deploy.</em></p>
+    </div>
 
-<div class="card">
-    <h3>Step 10: Wire the Frontend to the DAB Endpoint</h3>
-    <p class="voiceover">"Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Three quick changes in ModernApp.js."</p>
-    <p><em>Make three changes in <code>ModernApp.js</code>:</em></p>
+    <div class="card">
+        <h3>🔹 10. Wire the Frontend to the DAB Endpoint</h3>
+        <p><em>🎤 Voiceover:</em> "Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Three quick changes in ModernApp.js."</p>
+        <p><em>Make three changes in <code>ModernApp.js</code>:</em></p>
 
-    <p><strong>Change 1:</strong> Comment out the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
-    <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array and comment it out with <code>Ctrl+/</code>.</em></p>
+        <p><strong>Change 1:</strong> Comment out the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
+        <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array and comment it out with <code>Ctrl+/</code>.</em></p>
 
-    <p><strong>Change 2:</strong> Inside the <code>ModernApp()</function</code>, add a new state variable and fetch call. Paste the following right after the existing <code>useState</code> declarations (around line 1977):</p>
-    <pre id="code5a">const [magazines, setMagazines] = useState([]);</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code5a')">Copy</button>
+        <p><strong>Change 2:</strong> Inside the <code>ModernApp()</code> function, add a new state variable and fetch call. Paste the following right after the existing <code>useState</code> declarations (around line 1977):</p>
+        <pre id="code5a">const [magazines, setMagazines] = useState([]);</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code5a')">Copy</button>
 
-    <p>Then add the DAB fetch inside the existing <code>useEffect</code> block, right after <code>fetchData();</code> (around line 1997):</p>
-    <pre id="code5b">    axios.get('http://localhost:5000/api/magazines')
+        <p>Then add the DAB fetch inside the existing <code>useEffect</code> block, right after <code>fetchData();</code> (around line 1997):</p>
+        <pre id="code5b">    axios.get('http://localhost:5000/api/magazines')
       .then(res => setMagazines(res.data.value))
       .catch(err => console.error(err));</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code5b')">Copy</button>
+        <button class="copy-btn" onclick="copyToClipboard('code5b')">Copy</button>
 
-    <p><strong>Change 3:</strong> Update the route to use the new state variable instead of <code>MAGAZINES_DATA</code> (around line 2042). Change:</p>
-    <pre id="code5c">&lt;MagazinesPage magazines={MAGAZINES_DATA} /&gt;</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code5c')">Copy</button>
-    <p>To:</p>
-    <pre id="code5d">&lt;MagazinesPage magazines={magazines} /&gt;</pre>
-    <button class="copy-btn" onclick="copyToClipboard('code5d')">Copy</button>
-</div>
+        <p><strong>Change 3:</strong> Update the route to use the new state variable instead of <code>MAGAZINES_DATA</code> (around line 2042). Change:</p>
+        <pre id="code5c">&lt;MagazinesPage magazines={MAGAZINES_DATA} /&gt;</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code5c')">Copy</button>
+        <p>To:</p>
+        <pre id="code5d">&lt;MagazinesPage magazines={magazines} /&gt;</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code5d')">Copy</button>
+    </div>
 
-<div class="card">
-    <h3>Step 11: Verify in the App</h3>
-    <p class="voiceover">"Let me refresh the app and navigate to the Magazines page. Now we're seeing live data from the database, served through DAB, displayed in our React frontend. The full stack is connected."</p>
-    <p><em>Show: Refresh the frontend at <code>http://localhost:3001/magazines</code>. The magazine cards now show the science-themed data we inserted from the database.</em></p>
-</div>
+    <div class="card">
+        <h3>🔹 11. Verify in the App</h3>
+        <p><em>🎤 Voiceover:</em> "Let me refresh the app and navigate to the Magazines page. Now we're seeing live data from the database, served through DAB, displayed in our React frontend. The full stack is connected."</p>
+        <p><em>Show: Refresh the frontend at <code>http://localhost:3001/magazines</code>. The magazine cards now show the science-themed data we inserted from the database.</em></p>
+    </div>
 
-<h2>What We Accomplished</h2>
+<h2>🎯 What We Accomplished</h2>
 <div class="card">
     <p>In this demo, we went from a hardcoded frontend to a fully connected stack:</p>
     <ul>
         <li>Used <strong>Schema Designer</strong> to visually create the magazines table</li>
         <li>Used <strong>GitHub Copilot</strong> integrated in Schema Designer to generate table structures from JSON</li>
-        <li>Added a <strong>many-to-many relationship</strong> with the existing authors table</li>
+        <li>Added a <strong>many-to-many relationship</strong> with the existing authors table using GitHub Copilot</li>
         <li>Generated <strong>science-themed test data</strong> with GitHub Copilot</li>
         <li>Created a <strong>read-only REST API</strong> using Data API Builder, configured with GitHub Copilot</li>
         <li>Wired the <strong>React frontend</strong> to the live API endpoint</li>
@@ -244,8 +239,8 @@ Ensure that the foreign key columns align with the current database schema for b
     </ul>
 </div>
 
-<h2>Closing Statement</h2>
-<p class="voiceover">"In just a few minutes, we went from hardcoded data to a fully connected stack -- database table, relationships, test data, REST API, and frontend -- all without leaving VS Code. The Schema Designer with GitHub Copilot integration and Data API Builder make database development faster and more visual than ever."</p>
+<h2>🎯 Closing Statement</h2>
+<p><em>🎤 Voiceover:</em> "In just a few minutes, we went from hardcoded data to a fully connected stack -- database table, relationships, test data, REST API, and frontend -- all without leaving VS Code. The Schema Designer with GitHub Copilot integration and Data API Builder make database development faster and more visual than ever."</p>
 
 <p><strong>We'd love your feedback -- and we can't wait to see what you build.</strong></p>
 
@@ -254,11 +249,13 @@ function copyToClipboard(id) {
     const el = document.getElementById(id);
     const text = el.innerText;
     navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('toast');
-        toast.style.opacity = '1';
-        setTimeout(() => {
-            toast.style.opacity = '0';
-        }, 2000);
+
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2000);
+
     });
 }
 </script>
@@ -277,7 +274,7 @@ function copyToClipboard(id) {
     transition: opacity 0.4s ease-in-out;
     z-index: 1000;
 ">
-Copied to clipboard!
+📋 Copied to clipboard!
 </div>
 
 </body>
