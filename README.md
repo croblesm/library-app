@@ -457,14 +457,12 @@ The project includes a [GitHub Copilot custom instructions file](.github/copilot
 
 ### Demo Walkthroughs
 
-Interactive HTML guides are available in [`docs/demos/`](docs/demos/) for reproducing live presentations:
+Interactive HTML guides are available in [`docs/demos/`](docs/demos/) for reproducing live presentations. See [`docs/demos/README.md`](docs/demos/README.md) for full details.
 
-| Demo | File | Description |
-|------|------|-------------|
-| GitHub Copilot + MSSQL | [`github-copilot-demo.html`](docs/demos/github-copilot-demo.html) | Using GitHub Copilot with the MSSQL extension for database development |
-| AI-Ready with SQL Server 2025 | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Adding VECTOR columns, embeddings, and semantic search |
-| Schema Designer | [`schema-designer-demo.html`](docs/demos/schema-designer-demo.html) | Visual schema design with the MSSQL extension |
-| End-to-End Flow | [`library-demo-flow.html`](docs/demos/library-demo-flow.html) | Full demo orchestration from setup to AI search |
+| Demo | Duration | File | Description |
+|------|----------|------|-------------|
+| Schema Designer + GitHub Copilot | ~15 min | [`schema-designer-demo.html`](docs/demos/schema-designer-demo.html) | Goes from hardcoded frontend data to a fully connected stack using the Schema Designer, GitHub Copilot, and Data API Builder |
+| Making the App AI-Ready | ~20 min | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Spec-driven development (PRD + custom instructions + cross-platform AI agent files) and AI-powered semantic search with SQL Server 2025's VECTOR data type |
 
 Open any `.html` file in a browser to follow along step-by-step with copyable code snippets.
 
