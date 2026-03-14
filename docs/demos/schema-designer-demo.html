@@ -189,28 +189,23 @@ Ensure that the foreign key columns align with the current database schema for b
 
     <div class="card">
         <h3>🔹 10. Wire the Frontend to the DAB Endpoint</h3>
-        <p><em>🎤 Voiceover:</em> "Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. Three quick changes in ModernApp.js."</p>
-        <p><em>Make three changes in <code>ModernApp.js</code>:</em></p>
+        <p><em>🎤 Voiceover:</em> "Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. The code is already pre-staged with commented lines -- I just need to toggle three things in ModernApp.js."</p>
+        <p><em>Make three quick changes in <code>ModernApp.js</code> (all code is pre-staged as comments):</em></p>
 
-        <p><strong>Change 1:</strong> Comment out the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
-        <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array and comment it out with <code>Ctrl+/</code>.</em></p>
+        <p><strong>Change 1:</strong> <strong>Comment out</strong> the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
+        <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array (lines 26-32) and comment it out with <code>Ctrl+/</code>.</em></p>
 
-        <p><strong>Change 2:</strong> Inside the <code>ModernApp()</code> function, add a new state variable and fetch call. Paste the following right after the existing <code>useState</code> declarations (around line 1977):</p>
-        <pre id="code5a">const [magazines, setMagazines] = useState([]);</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code5a')">Copy</button>
+        <p><strong>Change 2:</strong> <strong>Uncomment</strong> the magazine state and DAB fetch (already in the code as comments):</p>
+        <ul>
+            <li>Uncomment <code>const [magazines, setMagazines] = useState([]);</code> (around line 2039)</li>
+            <li>Uncomment the <code>axios.get('http://localhost:5000/api/magazines')</code> block (around lines 2060-2062)</li>
+        </ul>
 
-        <p>Then add the DAB fetch inside the existing <code>useEffect</code> block, right after <code>fetchData();</code> (around line 1997):</p>
-        <pre id="code5b">    axios.get('http://localhost:5000/api/magazines')
-      .then(res => setMagazines(res.data.value))
-      .catch(err => console.error(err));</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code5b')">Copy</button>
-
-        <p><strong>Change 3:</strong> Update the route to use the new state variable instead of <code>MAGAZINES_DATA</code> (around line 2042). Change:</p>
-        <pre id="code5c">&lt;MagazinesPage magazines={MAGAZINES_DATA} /&gt;</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code5c')">Copy</button>
-        <p>To:</p>
-        <pre id="code5d">&lt;MagazinesPage magazines={magazines} /&gt;</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code5d')">Copy</button>
+        <p><strong>Change 3:</strong> In the Routes section (around lines 2103-2104):</p>
+        <ul>
+            <li><strong>Comment out</strong> the line with <code>magazines={MAGAZINES_DATA}</code></li>
+            <li><strong>Uncomment</strong> the line with <code>magazines={magazines}</code></li>
+        </ul>
     </div>
 
     <div class="card">
@@ -243,6 +238,18 @@ Ensure that the foreign key columns align with the current database schema for b
 <p><em>🎤 Voiceover:</em> "In just a few minutes, we went from hardcoded data to a fully connected stack -- database table, relationships, test data, REST API, and frontend -- all without leaving VS Code. The Schema Designer with GitHub Copilot integration and Data API Builder make database development faster and more visual than ever."</p>
 
 <p><strong>We'd love your feedback -- and we can't wait to see what you build.</strong></p>
+
+<h2>📚 Resources</h2>
+<div class="card">
+    <p>Want to learn more? Check out these resources:</p>
+    <ul>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-demos">MSSQL Extension Demos</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-copilot-demos">GitHub Copilot + MSSQL Extension Demos</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-schema-designer-copilot-docs">Schema Designer + GitHub Copilot Docs</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-dab-docs">Data API Builder (DAB) Docs</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-dab-copilot-docs">Data API Builder + GitHub Copilot Docs</a></strong></li>
+    </ul>
+</div>
 
 <script>
 function copyToClipboard(id) {
