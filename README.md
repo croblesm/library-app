@@ -462,7 +462,7 @@ Interactive HTML guides are available in [`docs/demos/`](docs/demos/) for reprod
 | Demo | Duration | File | Description |
 |------|----------|------|-------------|
 | Schema Designer + GitHub Copilot | ~15 min | [`schema-designer-demo.html`](docs/demos/schema-designer-demo.html) | Goes from hardcoded frontend data to a fully connected stack using the Schema Designer, GitHub Copilot, and Data API Builder |
-| Making the App AI-Ready | ~20 min | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Spec-driven development (PRD + custom instructions + cross-platform AI agent files) and AI-powered semantic search with SQL Server 2025's VECTOR data type |
+| Making the App AI-Ready | ~15 min | [`library-ai-ready-demo.html`](docs/demos/library-ai-ready-demo.html) | Spec-driven development (PRD + custom instructions + cross-platform AI agent files) and AI-powered semantic search with SQL Server 2025's VECTOR data type |
 
 Open any `.html` file in a browser to follow along step-by-step with copyable code snippets.
 
@@ -558,3 +558,15 @@ If you change the embedding model, the vector dimensions must match:
 1. Check your model's output dimension
 2. Drop and re-create the `description_embedding` column with the correct size
 3. Re-run the backfill script
+
+---
+
+## Resources
+
+Learn more about the tools and features showcased in this project:
+
+- [MSSQL Extension Demos](https://aka.ms/vscode-mssql-demos)
+- [GitHub Copilot + MSSQL Extension Demos](https://aka.ms/vscode-mssql-copilot-demos)
+- [Schema Designer + GitHub Copilot Docs](https://aka.ms/vscode-mssql-schema-designer-copilot-docs)
+- [Data API Builder (DAB) Docs](https://aka.ms/vscode-mssql-dab-docs)
+- [Data API Builder + GitHub Copilot Docs](https://aka.ms/vscode-mssql-dab-copilot-docs)

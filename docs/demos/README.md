@@ -17,7 +17,7 @@ Goes from hardcoded frontend data to a fully connected stack using the Schema De
 - Data API Builder for instant REST APIs
 - Wiring a React frontend to the live endpoint
 
-### Demo 2: Making the App AI-Ready with SQL Server 2025 (~20 min)
+### Demo 2: Making the App AI-Ready with SQL Server 2025 (~15 min)
 
 **File:** [library-ai-ready-demo.html](library-ai-ready-demo.html)
 
@@ -55,3 +55,11 @@ Shows spec-driven development (PRD + custom instructions) and adds AI-powered se
 | `app/frontend/library-frontend/src/ModernApp.js` | Demo 1, Steps 3, 10 | React frontend with MAGAZINES_DATA array |
 | `app/backend/ai/backfill_embeddings.py` | Demo 2, Step 8 | Python script to generate and store book embeddings |
 | `app/backend/ai/chat_service.py` | Demo 2, Step 10 | FastAPI semantic search service |
+
+## Resources
+
+- [MSSQL Extension Demos](https://aka.ms/vscode-mssql-demos)
+- [GitHub Copilot + MSSQL Extension Demos](https://aka.ms/vscode-mssql-copilot-demos)
+- [Schema Designer + GitHub Copilot Docs](https://aka.ms/vscode-mssql-schema-designer-copilot-docs)
+- [Data API Builder (DAB) Docs](https://aka.ms/vscode-mssql-dab-docs)
+- [Data API Builder + GitHub Copilot Docs](https://aka.ms/vscode-mssql-dab-copilot-docs)

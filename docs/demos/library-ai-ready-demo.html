@@ -107,7 +107,7 @@
 </script>
 
 <h1>🤖 Making the Library App AI-Ready with SQL Server 2025</h1>
-<p><em>Duration: ~20 minutes</em></p>
+<p><em>Duration: ~15 minutes</em></p>
 
 <h2>🎬 Scenario Introduction</h2>
 <p>I've been asked to add AI-powered semantic search to our existing Library app. The app is built with Node.js and Sequelize, but instead of modifying the ORM layer, I'll enhance the database directly using SQL Server 2025's new VECTOR capabilities.</p>
@@ -195,130 +195,84 @@ ADD description_embedding VECTOR(768) NULL;</pre>
     </div>
 
     <div class="card">
-        <h3>🔹 Step 7: Ask GitHub Copilot to Create a Vector Index</h3>
-        <p><em>🎤 Voiceover:</em> "For optimal performance with vector similarity searches, we should create an index on the VECTOR column. Let's ask GitHub Copilot to generate that statement too."</p>
-        <pre id="code4">Create a vector index on the description_embedding column in the books table to optimize similarity search queries.</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
-        <p><strong>Expected SQL:</strong></p>
-        <pre id="code5">CREATE INDEX IX_books_description_embedding
-ON books(description_embedding);</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
-        <p><em>Note: In the demo, we assume these schema changes have already been applied.</em></p>
-    </div>
-
-    <div class="card">
-        <h3>🔹 Step 8: Run the Embedding Backfill Script</h3>
+        <h3>🔹 Step 7: Run the Embedding Backfill Script</h3>
         <p><em>🎤 Voiceover:</em> "Now that we've added the VECTOR column and index to our schema, it's time to populate it with embeddings. I've already prepared a Python script that will generate embeddings for all our books using Ollama. Let me run it now."</p>
-        <pre id="code6">python app/backend/ai/backfill_embeddings.py</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button>
+        <pre id="code4">python app/backend/ai/backfill_embeddings.py</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code4')">Copy</button>
         <p><em>🎤 Voiceover:</em> "The script connects to SQL Server, reads all books from our database, generates 768-dimensional vector embeddings using Ollama's nomic-embed-text model, and populates the new VECTOR column. This should only take a moment for our ~200 books."</p>
     </div>
 
     <div class="card">
-        <h3>🔹 Step 9: Verify the Embeddings in the Database</h3>
-        <p><em>🎤 Voiceover:</em> "Great! Now let's verify in VS Code that the embeddings were successfully created. I'll use GitHub Copilot to help me write a quick query to check."</p>
-        <pre id="code7">Show me the first 5 books and whether they have embeddings in the description_embedding column.</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button>
-        <p><strong>Expected SQL that GitHub Copilot will generate:</strong></p>
-        <pre id="code8">SELECT TOP 5 id, title,
-       CASE WHEN description_embedding IS NOT NULL
-            THEN 'Embedding exists'
-            ELSE 'No embedding'
-       END AS EmbeddingStatus
-FROM books;</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code8')">Copy</button>
-        <p><em>🎤 Voiceover:</em> "Notice GitHub Copilot used <code>TOP 5</code> -- not <code>LIMIT 5</code>. That's SQL Server syntax, enforced by our custom instructions. All our books now have vector embeddings stored in SQL Server 2025."</p>
-    </div>
-
-    <div class="card">
-        <h3>🔹 Step 10: Start the Chat Service</h3>
+        <h3>🔹 Step 8: Start the Chat Service</h3>
         <p><em>🎤 Voiceover:</em> "Now for the exciting part -- I've built a FastAPI service that performs semantic search over our books using SQL Server 2025's vector similarity functions. Let me start it up."</p>
-        <pre id="code9">python app/backend/ai/chat_service.py</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code9')">Copy</button>
+        <pre id="code5">python app/backend/ai/chat_service.py</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code5')">Copy</button>
         <p><em>🎤 Voiceover:</em> "The service is now running on port 8000. It exposes a /chat endpoint that takes natural language questions and returns the most relevant books using vector similarity search."</p>
     </div>
 
     <div class="card">
-        <h3>🔹 Step 11: Test Semantic Search with Natural Language</h3>
-        <p><em>🎤 Voiceover:</em> "Let's test it! I'll send a natural language question about books I want to read. Watch how it returns relevant results based on semantic similarity, not just keyword matching."</p>
-        <p><strong>Example question:</strong></p>
-        <pre id="code10">I want to read science fiction about space exploration</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code10')">Copy</button>
-
-        <p><em>🎤 Voiceover:</em> "I'll send this to the /chat endpoint using curl -- or you can test it in the interactive API docs at localhost:8000/docs."</p>
-
-        <p><strong>curl command:</strong></p>
-        <pre id="code11">curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"question": "I want to read science fiction about space exploration"}'</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code11')">Copy</button>
-
-        <p><strong>Response:</strong></p>
-        <pre id="code12">{
-  "question": "I want to read science fiction about space exploration",
-  "results": [
-    {
-      "id": 9,
-      "title": "2001: A Space Odyssey",
-      "category": "Science Fiction",
-      "year": 1968,
-      "similarity_score": 0.89
-    },
-    {
-      "id": 10,
-      "title": "2010: Odyssey Two",
-      "category": "Science Fiction",
-      "year": 1982,
-      "similarity_score": 0.85
-    },
-    {
-      "id": 20,
-      "title": "From the Earth to the Moon",
-      "category": "Adventure",
-      "year": 1865,
-      "similarity_score": 0.78
-    }
-  ]
-}</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code12')">Copy</button>
-        <p><em>🎤 Voiceover:</em> "Notice how it returned books about space -- Arthur C. Clarke's Space Odyssey series and Jules Verne's journey to the moon. The semantic search understood the meaning of my question, not just keyword matching!"</p>
+        <h3>🔹 Step 9: SQL Notebook -- Verify and Explore</h3>
+        <p><em>🎤 Voiceover:</em> "While the chat service starts up, let me show you something cool -- the MSSQL extension now supports SQL Notebooks. I prepared one that combines SQL and Python in a single notebook to verify our setup."</p>
+        <p><em>Show: Open <code>.demo/sql-notebook/verify-ai-setup.ipynb</code> in VS Code. Walk through the cells:</em></p>
+        <ul>
+            <li><strong>Cell 1 (SQL)</strong> — Embedding coverage: how many of our 194 books have embeddings?</li>
+            <li><strong>Cell 2 (SQL)</strong> — Vector similarity search: find books most similar to <em>Dune</em> using <code>VECTOR_DISTANCE</code></li>
+            <li><strong>Cell 3 (Python)</strong> — Health check + chat question via the FastAPI service</li>
+        </ul>
+        <p><em>🎤 Voiceover:</em> "SQL and Python, side by side, in the same notebook -- right inside VS Code. This is great for exploring your data, testing queries, and prototyping without leaving the editor."</p>
     </div>
 
     <div class="card">
-        <h3>🔹 Step 12: Understanding the Vector Search SQL</h3>
-        <p><em>🎤 Voiceover:</em> "So how does this actually work? Let me show you the SQL query that powers the vector similarity search. This demonstrates how SQL Server 2025's VECTOR_DISTANCE function compares book embeddings."</p>
-        <pre id="code13">-- Vector similarity search query (768-dimensional vectors from Ollama)
--- This query finds books similar to a reference book by comparing their embeddings
-DECLARE @ReferenceBookId INT = 9; -- "2001: A Space Odyssey"
+        <h3>🔹 Step 10: Test Semantic Search in the App</h3>
+        <p><em>🎤 Voiceover:</em> "Now let's test it in the actual app! I'll open the Library app in the browser and use the built-in chat. Watch how it returns relevant results based on semantic similarity, not just keyword matching."</p>
+        <p><em>Show: Open the Library app at <code>localhost:3001</code>. Click the chat icon in the bottom-right corner and type a question:</em></p>
+        <pre id="code6">I want to read science fiction about space exploration</pre>
+        <button class="copy-btn" onclick="copyToClipboard('code6')">Copy</button>
+        <p><em>🎤 Voiceover:</em> "The chat sends the question to our FastAPI service, which embeds it, runs a vector similarity search in SQL Server, and uses an LLM to generate a conversational recommendation -- all in a few seconds. Notice it found books about space like Clarke's Space Odyssey series. It understood the meaning of my question, not just keywords!"</p>
+    </div>
 
-SELECT TOP 3
-    b.id,
-    b.title,
-    b.category,
-    b.year,
-    CAST(1 - VECTOR_DISTANCE('cosine', b.description_embedding,
-         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) AS FLOAT) AS SimilarityScore
-FROM books b
-WHERE b.description_embedding IS NOT NULL
-    AND b.id != @ReferenceBookId
-ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding,
-         (SELECT description_embedding FROM books WHERE id = @ReferenceBookId)) ASC;</pre>
-        <button class="copy-btn" onclick="copyToClipboard('code13')">Copy</button>
-        <p><em>🎤 Voiceover:</em> "The VECTOR_DISTANCE function calculates the cosine similarity between a reference book's embedding and all other books' embeddings. It returns varying similarity scores based on semantic closeness. In our chat service, we generate the embedding from the user's natural language question and use that as the query vector instead. It's running entirely in SQL Server -- no external vector database needed."</p>
+    <div class="card">
+        <h3>🔹 Step 11: Walk Through the Vector Search Code</h3>
+        <p><em>🎤 Voiceover:</em> "That was fast! Let me show you exactly where that magic happens in the code."</p>
+        <p><em>Show: Open <code>app/backend/ai/chat_service.py</code> in VS Code and walk through these sections:</em></p>
+        <ul>
+            <li><strong>Line ~456 — <code>search_similar_books()</code></strong> — This is the core function. It takes the user's question embedding and runs a vector similarity search in SQL Server.</li>
+            <li><strong>Lines ~577-603 — The VECTOR_DISTANCE query</strong> — The actual SQL that powers everything:
+                <pre id="code7">WITH VectorScores AS (
+    SELECT
+        b.id, b.title, b.category, b.year,
+        1 - VECTOR_DISTANCE('cosine', b.description_embedding,
+            CAST(? AS VECTOR(768))) AS SimilarityScore
+    FROM books b
+    WHERE b.description_embedding IS NOT NULL
+)
+SELECT TOP (?)
+    vs.id, vs.title, vs.category, vs.year,
+    STRING_AGG(CONCAT(a.first_name, ' ', a.last_name), ', ') as author_name,
+    vs.SimilarityScore
+FROM VectorScores vs
+LEFT JOIN books_authors ba ON vs.id = ba.book_id
+LEFT JOIN authors a ON ba.author_id = a.id
+GROUP BY vs.id, vs.title, vs.category, vs.year, vs.SimilarityScore
+ORDER BY vs.SimilarityScore DESC</pre>
+                <button class="copy-btn" onclick="copyToClipboard('code7')">Copy</button>
+            </li>
+            <li><strong>Line ~90 — <code>LIBRARIAN_SYSTEM_PROMPT</code></strong> — The guardrail: "Recommend books ONLY from the list below. NEVER invent books." This prevents hallucination.</li>
+            <li><strong>Line ~657 — <code>generate_response_with_rag()</code></strong> — The RAG orchestration: filter by similarity threshold, build a constrained prompt, call the LLM, then validate the response.</li>
+        </ul>
+        <p><em>🎤 Voiceover:</em> "The key insight is that <code>VECTOR_DISTANCE</code> runs entirely in SQL Server -- no external vector database needed. The CTE calculates cosine similarity for every book, then we join authors and return the top matches. The system prompt and validation layer ensure the LLM only recommends books that actually exist in our database."</p>
     </div>
 
 <h2>🎯 What We Accomplished</h2>
 <div class="card">
     <p>In this demo, we successfully transformed a traditional SQL Server-backed app into an AI-ready system with semantic search capabilities:</p>
     <ul>
-        <li>Showed how a <strong>PRD</strong> (<code>docs/PRD.md</code>) defines the project's data model and constraints</li>
-        <li>Showed how <strong>GitHub Copilot custom instructions</strong> (<code>.github/copilot-instructions.md</code>) enforce SQL Server syntax, lowercase naming, and Sequelize conventions in all generated code</li>
-        <li>Used <strong>GitHub Copilot</strong> to understand the schema and generate SQL statements -- always respecting the project's conventions</li>
-        <li>Added a <code>VECTOR(768)</code> column to the books table using SQL Server 2025's native VECTOR data type</li>
-        <li>Created a vector index for optimal search performance</li>
-        <li>Used Ollama's <code>nomic-embed-text</code> model for 768-dimensional embeddings</li>
-        <li>Built a FastAPI chat service that performs vector similarity search with <code>VECTOR_DISTANCE</code></li>
-        <li>Demonstrated semantic search that understands meaning, not just keywords</li>
+        <li>Showed how a <strong>PRD</strong> and <strong>GitHub Copilot custom instructions</strong> enforce project conventions in AI-generated code</li>
+        <li>Used <strong>GitHub Copilot</strong> to analyze the schema and generate the <code>ALTER TABLE</code> for <code>VECTOR(768)</code></li>
+        <li>Backfilled embeddings using Ollama's <code>nomic-embed-text</code> model</li>
+        <li>Tested semantic search live in the app's chat UI</li>
+        <li>Walked through the actual <code>VECTOR_DISTANCE</code> query and RAG guardrails in <code>chat_service.py</code></li>
+        <li>Explored data with a SQL Notebook combining SQL and Python in VS Code</li>
     </ul>
     <p><strong>Key takeaways:</strong></p>
     <ul>
@@ -326,12 +280,12 @@ ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding,
         <li>SQL Server 2025's VECTOR type enables native storage and search of embeddings -- no external vector database needed</li>
         <li>GitHub Copilot + MSSQL extension respects project conventions when you define them in custom instructions</li>
         <li>Existing apps can become AI-ready without rewriting application code</li>
-        <li>The entire workflow happens inside VS Code -- no context switching</li>
+        <li>The entire workflow happens inside VS Code -- SQL, Python, notebooks, chat -- no context switching</li>
     </ul>
 </div>
 
 <h2>🎯 Closing Statement</h2>
-<p><em>🎤 Voiceover:</em> "In just a few minutes, we showed how spec-driven development -- a PRD plus GitHub Copilot custom instructions -- keeps AI-generated code consistent with your project's conventions. Then we used GitHub Copilot to evolve our database schema, added SQL Server 2025's VECTOR capabilities with Ollama for embeddings, and demonstrated semantic search -- all without changing a single line of our Node.js application code. The app is now AI-ready."</p>
+<p><em>🎤 Voiceover:</em> "In just a few minutes, we showed how spec-driven development -- a PRD plus GitHub Copilot custom instructions -- keeps AI-generated code consistent with your project's conventions. Then we used GitHub Copilot to add SQL Server 2025's VECTOR column, backfilled embeddings, tested semantic search live in the app, and walked through the actual code that powers it -- including a SQL Notebook mixing SQL and Python. The app is now AI-ready."</p>
 
 <h2>📚 Resources</h2>
 <div class="card">
@@ -341,8 +295,11 @@ ORDER BY VECTOR_DISTANCE('cosine', b.description_embedding,
         <li>🤖 <strong>GitHub Copilot Instructions:</strong> <code>.github/copilot-instructions.md</code> -- custom instructions that shape GitHub Copilot's output</li>
         <li>📋 <strong>AGENTS.md:</strong> Cross-platform AI agent instructions (Codex, Cline, Windsurf, etc.)</li>
         <li>🐍 <strong>Python Scripts:</strong> <code>app/backend/ai/</code> for the backfill and chat service code</li>
-        <li>💡 <strong>SQL Server 2025:</strong> Learn more about VECTOR data types and vector similarity search</li>
-        <li>🤖 <strong>GitHub Copilot:</strong> Sign up for access to GitHub Copilot with the MSSQL extension</li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-demos">MSSQL Extension Demos</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-copilot-demos">GitHub Copilot + MSSQL Extension Demos</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-schema-designer-copilot-docs">Schema Designer + GitHub Copilot Docs</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-dab-docs">Data API Builder (DAB) Docs</a></strong></li>
+        <li>🔗 <strong><a href="https://aka.ms/vscode-mssql-dab-copilot-docs">Data API Builder + GitHub Copilot Docs</a></strong></li>
     </ul>
 </div>
 
