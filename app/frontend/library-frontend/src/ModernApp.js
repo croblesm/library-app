@@ -23,13 +23,13 @@ const API_BASE = 'http://localhost:3000';
 const CHAT_API_BASE = 'http://localhost:8000';
 
 // Step 10a: Comment out this hardcoded data and switch to DAB endpoint
-const MAGAZINES_DATA = [
-  { id: 1, title: "Tech Monthly", issue: 1, year: 2025, category: "Science" },
-  { id: 2, title: "Quantum Quarterly", issue: 4, year: 2024, category: "Physics" },
-  { id: 3, title: "Bio Frontiers", issue: 2, year: 2025, category: "Biology" },
-  { id: 4, title: "Robo World", issue: 7, year: 2024, category: "Robotics" },
-  { id: 5, title: "Star Gazer", issue: 12, year: 2023, category: "Astronomy" },
-];
+// const MAGAZINES_DATA = [
+//   { id: 1, title: "Tech Monthly", issue: 1, year: 2025, category: "Science" },
+//   { id: 2, title: "Quantum Quarterly", issue: 4, year: 2024, category: "Physics" },
+//   { id: 3, title: "Bio Frontiers", issue: 2, year: 2025, category: "Biology" },
+//   { id: 4, title: "Robo World", issue: 7, year: 2024, category: "Robotics" },
+//   { id: 5, title: "Star Gazer", issue: 12, year: 2023, category: "Astronomy" },
+// ];
 
 
 // Dark theme - True dark mode (almost black background)
@@ -2037,7 +2037,7 @@ export default function ModernApp() {
   const [authors, setAuthors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   // Step 10b: Uncomment the line below ↓
-  // const [magazines, setMagazines] = useState([]);
+  const [magazines, setMagazines] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -2058,9 +2058,9 @@ export default function ModernApp() {
   useEffect(() => {
     fetchData();
     // Step 10c: Uncomment the lines below ↓
-    // axios.get('http://localhost:5000/api/magazines')
-    //   .then(res => setMagazines(res.data.value))
-    //   .catch(err => console.error(err));
+    axios.get('http://localhost:5001/api/magazines')
+      .then(res => setMagazines(res.data.value))
+      .catch(err => console.error(err));
   }, []);
 
   if (loading) {
@@ -2104,8 +2104,8 @@ export default function ModernApp() {
           <Route path="/books" element={<BooksPage books={books} authors={authors} onRefresh={fetchData} />} />
           <Route path="/authors" element={<AuthorsPage authors={authors} onRefresh={fetchData} />} />
           {/* Step 10d: Comment the line below and uncomment the one after it */}
-          <Route path="/magazines" element={<MagazinesPage magazines={MAGAZINES_DATA} />} />
-          {/* <Route path="/magazines" element={<MagazinesPage magazines={magazines} />} /> */}
+          {/* <Route path="/magazines" element={<MagazinesPage magazines={MAGAZINES_DATA} />} /> */}
+          <Route path="/magazines" element={<MagazinesPage magazines={magazines} />} />
         </Routes>
       </Router>
     </ThemeProvider>
