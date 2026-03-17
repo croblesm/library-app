@@ -158,10 +158,11 @@ Ensure that the foreign key columns align with the current database schema for b
     <div class="card">
         <h3>🔹 7. Generate Science-Themed Test Data</h3>
         <p><em>🎤 Voiceover:</em> "Now I need some test data. Instead of writing it by hand, I'll ask GitHub Copilot to generate realistic mockup data for our new table."</p>
-        <pre id="code3">Generate mockup data for the magazines table.
+        <pre id="code3">Seed the magazines and magazines_authors tables with test data. Run the INSERT statements directly against the database.
+- The tables already exist -- do NOT create or alter them.
 - Each magazine should be themed around science or technology (e.g., astronomy, physics, biology, robotics).
 - Include at least 5 magazines with creative titles, different issues, and years.
-- Also link each magazine to one or more existing authors in the authors table using the junction table.</pre>
+- Look up existing authors in the database and link each magazine to one or more authors using the magazines_authors junction table.</pre>
         <button class="copy-btn" onclick="copyToClipboard('code3')">Copy</button>
         <p><em>🎤 Voiceover:</em> "Before running anything, let me review what GitHub Copilot generated. I can see the SQL script it created -- let me inspect it to make sure the data looks right and the foreign keys match our schema."</p>
         <p><em>Show: Review the generated SQL script. Once satisfied, execute it.</em></p>
