@@ -1,0 +1,15 @@
+# Copy this file to terraform.tfvars and replace the placeholders with your own values.
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# terraform.tfvars is git-ignored on purpose: it names resources in YOUR tenant.
+
+# Name of the Microsoft Fabric workspace to create.
+fabric_workspace_name = "library-app-workspace"
+
+# Name of the Fabric SQL database to create inside that workspace.
+fabric_sql_database_name = "library-app"
+
+# Name of an EXISTING Fabric capacity to attach the workspace to.
+# Find it in the Fabric portal under Settings > Admin portal > Capacity settings.
+# A trial capacity looks like: Trial-<timestamp>-<random>
+fabric_capacity_name = "<your-fabric-capacity-name>"

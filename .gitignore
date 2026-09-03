@@ -20,8 +20,14 @@
 **/terraform.tfstate
 **/terraform.tfstate.*
 **/.terraform/
-**/.terraform.lock.hcl
 **/data.fabric_capacity.capacity
+
+# terraform.tfvars names resources in YOUR tenant - keep it local, ship the example.
+**/terraform.tfvars
+!**/terraform.tfvars.example
+
+# NOTE: .terraform.lock.hcl is deliberately NOT ignored. Commit it so provider
+# versions are reproducible for everyone who runs `terraform init`.
 
 # Python
 **/__pycache__/
