@@ -14,7 +14,7 @@ langchain-community>=0.2.0
 
 # Web framework
 fastapi>=0.100.0
-uvicorn>=0.20.0
+uvicorn>=0.52.4
 
 # Data validation (required by FastAPI)
 pydantic>=2.0.0
