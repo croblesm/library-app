@@ -53,7 +53,7 @@ This application is designed to run inside Dev Containers for quick setup and us
 ### Frontend
 - **React 18** single-page application
 - **Material UI (MUI) v7** for component library
-- **Tailwind CSS v4** available for utility classes
+- **MUI v7** components and `sx` styling; no utility-class framework
 - Dark theme with near-black background (#0a0a0a)
 - Card-based layouts with hover animations
 - **axios** for API calls to the backend
