@@ -1,20 +1,26 @@
 # Python dependencies for the Library AI/RAG service
 # Install: pip install -r requirements.txt
+#
+# Every line carries an upper bound. Without one, `langchain>=0.2.0` resolved to
+# LangChain 1.4.0, several breaking majors past what this code was written
+# against. The floors are unchanged, so this does not alter what pip picks
+# today; it stops the next major from arriving unannounced.
 
-# Database driver - Microsoft SQL Server native Python driver
-mssql-python>=1.0.0
+# SQL Server driver
+mssql-python>=1.0.0,<2.0.0
 
 # Environment variable loading
-python-dotenv>=1.0.0
+python-dotenv>=1.0.0,<2.0.0
 
-# LangChain - LLM/embedding abstraction framework
-langchain>=0.2.0
-langchain-ollama>=0.1.0
-langchain-community>=0.2.0
+# Embeddings and the local LLM, both via Ollama.
+# The service imports OllamaEmbeddings and OllamaLLM from this package only.
+# `langchain` and `langchain-community` were listed here but never imported by
+# any module, so they are gone.
+langchain-ollama>=0.1.0,<2.0.0
 
 # Web framework
-fastapi>=0.100.0
-uvicorn>=0.20.0
+fastapi>=0.100.0,<1.0.0
+uvicorn>=0.20.0,<1.0.0
 
 # Data validation (required by FastAPI)
-pydantic>=2.0.0
+pydantic>=2.0.0,<3.0.0

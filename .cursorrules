@@ -1,13 +1,7 @@
-You are working on a Library Management App that uses SQL Server as its database. Follow these rules strictly:
+The instructions for this repository live in AGENTS.md at the repository root.
 
-DATABASE: SQL Server only. Never use PostgreSQL, MySQL, or SQLite. Use NVARCHAR for strings, TOP N (not LIMIT). All table/column names are lowercase snake_case.
+Read AGENTS.md before making changes. It is the single source for the technology
+constraints (SQL Server only, Sequelize, React + MUI on Vite), the code
+conventions, the project structure and the environment variables.
 
-NODE.JS BACKEND (port 3000): Express 4.19 + Sequelize 6.37 with tedious driver. Models use async init pattern, stored on global.models, timestamps: false. Many-to-many: books <-> authors through books_authors with cascade delete. Do not use Prisma, Drizzle, or TypeORM.
-
-REACT FRONTEND (port 3001): React 18 + MUI v7, built with Vite. Main component: app/frontend/library-frontend/src/ModernApp.jsx. API calls via axios. Style with MUI sx props and the theme, not utility classes.
-
-ENVIRONMENT: Never hardcode passwords. Node.js uses app/backend/config/.env (DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE). Use .env.example templates with placeholder values.
-
-KEY FILES: Express entry: app/backend/index.js | Models: app/backend/models/ | Routes: app/backend/routes/ | DB config: app/backend/config/db.js | React: app/frontend/library-frontend/src/ModernApp.jsx | PRD: docs/PRD.md
-
-DO NOT: Switch database from SQL Server | Add timestamps to models | Use camelCase for DB columns | Create or modify files in .demo/
+This file used to restate them and drifted out of date.

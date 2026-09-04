@@ -63,7 +63,42 @@ This is a **Library Management App** built with Node.js, Express, Sequelize, and
 
 - **Never hardcode passwords or connection strings** in source code or documentation.
 - Use `.env.example` templates with placeholder values like `<your-password>`.
-- Node.js backend config: `app/backend/config/.env` (separate vars: `DB_SERVER`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`).
+- Both services ship a template:
+
+```bash
+cp app/backend/config/.env.example app/backend/config/.env
+cp app/backend/ai/.env.example    app/backend/ai/.env
+```
+
+**Node.js backend** (`app/backend/config/.env`), local SQL Server:
+
+```
+DB_SERVER=<your-server,your-port>
+DB_USER=<your-username>
+DB_PASSWORD=<your-password>
+DB_DATABASE=<your-database>
+```
+
+For a SQL database in Microsoft Fabric, set a connection string instead. Fabric
+supports Microsoft Entra ID only, so there is no username or password:
+
+```
+DB_CONNECTION_STRING=mssql://<server>.database.fabric.microsoft.com:1433/<db>?encrypt=true&trustServerCertificate=false
+```
+
+**Python AI service** (`app/backend/ai/.env`). Note the ADO.NET-style keys:
+`UID` and `PWD`, not `User Id` and `Password`.
+
+```
+MSSQL_CONNECTION_STRING=Server=<your-server>;Database=<your-database>;UID=<your-username>;PWD=<your-password>;TrustServerCertificate=yes;
+
+# Optional, defaults shown:
+# OLLAMA_BASE_URL=http://localhost:11434
+# EMBEDDING_MODEL=nomic-embed-text
+# LLM_MODEL=llama3.2:3b
+# LLM_TEMPERATURE=0.1
+# LLM_NUM_PREDICT=150
+```
 
 ---
 

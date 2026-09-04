@@ -370,7 +370,7 @@ terraform apply main.tfplan
 Create `app/backend/config/.env` with:
 
 ```env
-DB_CONNECTION_STRING=mssql://<your-fabric-server>.msit-database.fabric.microsoft.com:1433/<your-db>?encrypt=true&trustServerCertificate=false
+DB_CONNECTION_STRING=mssql://<your-fabric-server>.database.fabric.microsoft.com:1433/<your-db>?encrypt=true&trustServerCertificate=false
 ```
 
 > [!NOTE]
