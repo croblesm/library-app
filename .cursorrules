@@ -4,10 +4,10 @@ DATABASE: SQL Server only. Never use PostgreSQL, MySQL, or SQLite. Use NVARCHAR 
 
 NODE.JS BACKEND (port 3000): Express 4.19 + Sequelize 6.37 with tedious driver. Models use async init pattern, stored on global.models, timestamps: false. Many-to-many: books <-> authors through books_authors with cascade delete. Do not use Prisma, Drizzle, or TypeORM.
 
-REACT FRONTEND (port 3001): React 18 + MUI v7 + Tailwind CSS v4. Main component: app/frontend/library-frontend/src/ModernApp.js. API calls via axios.
+REACT FRONTEND (port 3001): React 18 + MUI v7, built with Vite. Main component: app/frontend/library-frontend/src/ModernApp.jsx. API calls via axios. Style with MUI sx props and the theme, not utility classes.
 
 ENVIRONMENT: Never hardcode passwords. Node.js uses app/backend/config/.env (DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE). Use .env.example templates with placeholder values.
 
-KEY FILES: Express entry: app/backend/index.js | Models: app/backend/models/ | Routes: app/backend/routes/ | DB config: app/backend/config/db.js | React: app/frontend/library-frontend/src/ModernApp.js | PRD: docs/PRD.md
+KEY FILES: Express entry: app/backend/index.js | Models: app/backend/models/ | Routes: app/backend/routes/ | DB config: app/backend/config/db.js | React: app/frontend/library-frontend/src/ModernApp.jsx | PRD: docs/PRD.md
 
 DO NOT: Switch database from SQL Server | Add timestamps to models | Use camelCase for DB columns | Create or modify files in .demo/

@@ -25,8 +25,9 @@ When generating code for this project, always follow these rules:
 
 ### React Frontend
 
-- Use **React 18** with **MUI v7** and **Tailwind CSS v4**.
-- The main UI is in `app/frontend/library-frontend/src/ModernApp.js`.
+- Use **React 18** with **MUI v7**, bundled by **Vite 7**. There is no Tailwind: style with MUI `sx` props and the theme.
+- JSX must live in `.jsx` files. Vite does not parse JSX from `.js`.
+- The main UI is in `app/frontend/library-frontend/src/ModernApp.jsx`.
 - API calls use `axios` to `http://localhost:3000` (backend).
 
 ### Environment Variables
@@ -43,7 +44,7 @@ When generating code for this project, always follow these rules:
 | Sequelize models | `app/backend/models/` |
 | Express routes | `app/backend/routes/` |
 | Database config | `app/backend/config/db.js` |
-| React app | `app/frontend/library-frontend/src/ModernApp.js` |
+| React app | `app/frontend/library-frontend/src/ModernApp.jsx` |
 | Seeders | `app/backend/seeders/` |
 
 ## Do NOT

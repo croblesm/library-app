@@ -9,7 +9,7 @@ Library App -- a GitHub Copilot demo application for live presentations. Showcas
 | Layer | Technology | Port |
 |-------|-----------|------|
 | Backend | Node.js, Express 4.19, Sequelize 6.37, tedious/mssql | 3000 |
-| Frontend | React 18.3, MUI v7, Tailwind CSS v4, axios, react-router-dom v6 | 3001 |
+| Frontend | React 18.3, MUI v7, Vite 7, axios, react-router-dom v7 | 3001 |
 | AI/RAG Service | Python, FastAPI, LangChain, Ollama | 8000 |
 | Database | SQL Server 2025 (Docker or Microsoft Fabric) | 1433 |
 | Embeddings | nomic-embed-text via Ollama (768-dimensional) | -- |
@@ -44,8 +44,8 @@ app/backend/routes/           Express route handlers
 app/backend/seeders/          Sequelize seeders (29 authors, 194 books)
 app/backend/scripts/          Utility scripts (dropAllTables.js, SQL files)
 app/frontend/library-frontend/  React SPA
-  src/ModernApp.js            Main component (all UI in one file)
-  src/index.js                Entry point
+  src/ModernApp.jsx            Main component (all UI in one file)
+  src/index.jsx               Entry point
 docs/                         Documentation
   PRD.md                      Product Requirements Document (base app spec)
   demos/                      Step-by-step demo walkthroughs (HTML)
