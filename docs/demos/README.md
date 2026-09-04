@@ -52,7 +52,7 @@ Shows spec-driven development (PRD + custom instructions) and adds AI-powered se
 | `docs/PRD.md` | Demo 2, Steps 1 | Product requirements -- defines data model, tech stack, conventions |
 | `.github/copilot-instructions.md` | Demo 2, Step 2 | GitHub Copilot custom instructions -- enforces SQL Server, naming conventions |
 | `AGENTS.md` | Demo 2, Step 3 | Cross-platform AI agent instructions (Codex, Cline, Windsurf, etc.) |
-| `app/frontend/library-frontend/src/ModernApp.js` | Demo 1, Steps 3, 10 | React frontend with MAGAZINES_DATA array |
+| `app/frontend/library-frontend/src/ModernApp.jsx` | Demo 1, Steps 3, 10 | React frontend with MAGAZINES_DATA array |
 | `app/backend/ai/backfill_embeddings.py` | Demo 2, Step 8 | Python script to generate and store book embeddings |
 | `app/backend/ai/chat_service.py` | Demo 2, Step 10 | FastAPI semantic search service |
 

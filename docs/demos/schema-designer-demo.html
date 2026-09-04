@@ -127,8 +127,8 @@
 
     <div class="card">
         <h3>🔹 3. Use GitHub Copilot to Create the Magazines Table</h3>
-        <p><em>🎤 Voiceover:</em> "Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.js -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask GitHub Copilot to create the table from that selection."</p>
-        <p><em>Show: Open <code>ModernApp.js</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
+        <p><em>🎤 Voiceover:</em> "Here's where it gets interesting. Instead of typing out the schema manually, I'll go to my React frontend code -- ModernApp.jsx -- and select the hardcoded JSON data for magazines. Then, right here in the Schema Designer chat, I'll ask GitHub Copilot to create the table from that selection."</p>
+        <p><em>Show: Open <code>ModernApp.jsx</code>, select the <code>MAGAZINES_DATA</code> array, then switch to the Schema Designer chat panel.</em></p>
         <pre id="code1">using the selected JSON structure, create a new table called Magazines</pre>
         <button class="copy-btn" onclick="copyToClipboard('code1')">Copy</button>
         <p><em>🎤 Voiceover:</em> "This is the key moment -- GitHub Copilot picked up the context from my JavaScript file and used it to create the database table. It understood the JSON structure, inferred the correct SQL Server data types, and followed the project's lowercase naming conventions. That's cross-file context awareness at work."</p>
@@ -190,8 +190,8 @@ Ensure that the foreign key columns align with the current database schema for b
 
     <div class="card">
         <h3>🔹 10. Wire the Frontend to the DAB Endpoint</h3>
-        <p><em>🎤 Voiceover:</em> "Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. The code is already pre-staged with commented lines -- I just need to toggle three things in ModernApp.js."</p>
-        <p><em>Make three quick changes in <code>ModernApp.js</code> (all code is pre-staged as comments):</em></p>
+        <p><em>🎤 Voiceover:</em> "Now I just need to update the frontend to fetch from the DAB endpoint instead of using hardcoded data. The code is already pre-staged with commented lines -- I just need to toggle three things in ModernApp.jsx."</p>
+        <p><em>Make three quick changes in <code>ModernApp.jsx</code> (all code is pre-staged as comments):</em></p>
 
         <p><strong>Change 1:</strong> <strong>Comment out</strong> the <code>MAGAZINES_DATA</code> constant (around line 26).</p>
         <p><em>Show: Select the entire <code>MAGAZINES_DATA</code> array (lines 26-32) and comment it out with <code>Ctrl+/</code>.</em></p>
