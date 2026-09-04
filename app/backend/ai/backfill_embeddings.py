@@ -9,9 +9,11 @@ Since the books table doesn't have a description column, we use the
 combination of title + category as the text to generate embeddings.
 
 Prerequisites:
-- SQL Server 2025 with VECTOR data type support
-- books table with description_embedding VECTOR(768) column already added
-- Vector index on description_embedding column (recommended for performance)
+- SQL Server 2025 (or a SQL database in Microsoft Fabric) for the VECTOR type
+- The books table, created by starting the backend and running the seeders
+
+The description_embedding column and its index are created by this script if
+they are missing, so there is nothing to set up by hand.
 - Ollama running with nomic-embed-text model: ollama serve
 """
 
@@ -174,16 +176,49 @@ def update_book_embedding(cursor, book_id, embedding_vector):
 
     cursor.execute(update_query, (vector_str, book_id))
 
+def ensure_embedding_column(cursor, dimensions=768):
+    """
+    Create the VECTOR column and its index if they are not already there.
+
+    This lives here rather than in the README because this script is the only
+    thing that needs the column, it is already connected to the database, and a
+    setup step that exists only as SQL to copy and paste is a step that gets
+    skipped. The statement is guarded, so re-running is harmless.
+
+    Only the column is created, deliberately not a vector index. On SQL Server
+    2025 a vector index makes the whole table read-only:
+
+        Msg 42231: Data modification statement failed because table 'books'
+        has a vector index on it.
+
+    which breaks POST /books. VECTOR_DISTANCE works without an index, just as an
+    exact scan, so the index is left as an opt-in step documented in the README.
+
+    Requires SQL Server 2025 or a SQL database in Microsoft Fabric, which is
+    where the VECTOR type was introduced.
+    """
+    # Interpolated, not parameterised: a column type is part of the DDL and
+    # cannot be a bind parameter. `dimensions` is an int argument, never input.
+    cursor.execute(f"""
+        IF COL_LENGTH('dbo.books', 'description_embedding') IS NULL
+            ALTER TABLE dbo.books ADD description_embedding VECTOR({int(dimensions)}) NULL;
+    """)
+
+    cursor.commit()
+    print(f"✅ description_embedding VECTOR({dimensions}) column ready")
+
+
 def backfill_embeddings():
     """
     Main function to backfill embeddings for all books.
 
     Process:
     1. Connect to SQL Server
-    2. Load embedding model
-    3. Fetch all books with descriptions
-    4. Generate embeddings for each book
-    5. Update the VECTOR column in the database
+    2. Make sure the VECTOR column exists
+    3. Load embedding model
+    4. Fetch all books with descriptions
+    5. Generate embeddings for each book
+    6. Update the VECTOR column in the database
     """
     print("=" * 60)
     print("📚 Library AI Embeddings Backfill Script")
@@ -193,10 +228,13 @@ def backfill_embeddings():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Step 2: Initialize the embedding model
+    # Step 2: Make sure the column this script writes to actually exists
+    ensure_embedding_column(cursor)
+
+    # Step 3: Initialize the embedding model
     embeddings_model = initialize_embedding_model()
 
-    # Step 3: Fetch all books from database
+    # Step 4: Fetch all books from database
     books = fetch_books(cursor)
 
     if not books:
@@ -205,7 +243,7 @@ def backfill_embeddings():
         conn.close()
         return
 
-    # Step 4 & 5: Process each book - generate embedding and update database
+    # Step 5 & 6: Process each book - generate embedding and update database
     print(f"\n🔄 Processing {len(books)} books...")
     processed = 0
     failed = 0
