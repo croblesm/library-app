@@ -29,11 +29,13 @@ This is a **Library Management App** built with Node.js, Express, Sequelize, and
 - Do NOT suggest switching to Prisma, Drizzle, TypeORM, Knex, or raw SQL for the Node.js layer.
 - Sequelize uses the `tedious` driver for SQL Server connectivity.
 
-### Frontend: React + MUI + Tailwind
+### Frontend: React + MUI, built with Vite
 
-- Frontend is React 18 with Material UI (MUI) v7 and Tailwind CSS v4.
+- Frontend is React 18 with Material UI (MUI) v7, bundled by Vite 7.
+- There is no Tailwind. Style with MUI `sx` props and the theme.
+- JSX lives in `.jsx` files; Vite does not parse JSX from `.js`.
 - Do NOT suggest switching to Next.js, Vue, Angular, Svelte, or other frameworks.
-- All UI lives in a single `ModernApp.js` component (intentional for demo simplicity).
+- All UI lives in a single `ModernApp.jsx` component (intentional for demo simplicity).
 
 ### Infrastructure: Terraform (optional)
 
@@ -80,13 +82,13 @@ library-app/
 │   │   ├── routes/                     # Express route handlers
 │   │   ├── seeders/                    # Sequelize seeders (29 authors, ~200 books)
 │   │   ├── scripts/                    # Utility scripts
-│   │   ├── index.js                    # Express entry point
+│   │   ├── index.jsx                   # Express entry point
 │   │   └── package.json
 │   └── frontend/
 │       └── library-frontend/           # React SPA (port 3001)
 │           ├── src/
-│           │   ├── ModernApp.js        # Main app component
-│           │   └── index.js            # Entry point
+│           │   ├── ModernApp.jsx        # Main app component
+│           │   └── index.jsx           # Entry point
 │           └── package.json
 ├── docs/                               # Documentation
 │   ├── PRD.md                          # Product Requirements Document

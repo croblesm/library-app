@@ -9,7 +9,7 @@ A full-stack library management application with AI-powered book recommendations
 
 ```mermaid
 graph LR
-    A["React Frontend<br/>(port 3001)<br/>MUI + Tailwind"] -->|REST API| B["Express Backend<br/>(port 3000)<br/>Sequelize ORM"]
+    A["React Frontend<br/>(port 3001)<br/>MUI + Vite"] -->|REST API| B["Express Backend<br/>(port 3000)<br/>Sequelize ORM"]
     B -->|tedious| C["SQL Server 2025<br/>VECTOR support<br/>books, authors,<br/>books_authors"]
     A -->|/chat| D["FastAPI AI/RAG<br/>(port 8000)<br/>Ollama LLM +<br/>Embeddings"]
     D -->|mssql_python| C
@@ -19,7 +19,7 @@ graph LR
 
 | Layer | Technology | Details |
 |-------|-----------|---------|
-| Frontend | React 18, MUI v7, Tailwind CSS v4 | Single-page app with axios for API calls |
+| Frontend | React 18, MUI v7, Vite 7 | Single-page app with axios for API calls |
 | Backend | Node.js, Express 4.19, Sequelize 6.37 | REST API with code-first schema |
 | AI/RAG Service | Python, FastAPI, LangChain | Semantic search + natural language responses |
 | Database | SQL Server 2025 | Native VECTOR(768) for embeddings |
@@ -80,14 +80,14 @@ library-app/
 │   │   │   └── BooksAuthors.js         # /books_authors endpoints
 │   │   ├── seeders/                    # Sequelize seeders (test data)
 │   │   ├── scripts/                    # Utility scripts (drop tables)
-│   │   ├── index.js                    # Express entry point
+│   │   ├── index.jsx                   # Express entry point
 │   │   └── package.json
 │   └── frontend/
 │       └── library-frontend/           # React SPA
 │           ├── src/
-│           │   ├── ModernApp.js        # Main app component
+│           │   ├── ModernApp.jsx        # Main app component
 │           │   ├── ModernApp.css       # Styles
-│           │   └── index.js            # Entry point
+│           │   └── index.jsx           # Entry point
 │           └── package.json
 ├── docs/                               # Documentation
 │   ├── PRD.md                          # Product Requirements Document
