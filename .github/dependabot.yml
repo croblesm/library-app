@@ -1,56 +1,43 @@
 version: 2
 
+# Security updates only.
+#
+# `open-pull-requests-limit: 0` switches OFF routine version-update pull
+# requests for an ecosystem while leaving security updates working, which is
+# exactly what this repository wants: it has no CI, so a version bump arrives
+# with nothing to catch a regression, and enabling version updates opened 14
+# unreviewable pull requests in one go.
+#
+# The manifests are still listed. Without them Dependabot has no configuration
+# for these ecosystems at all, and the list is what to raise the limit on once
+# there is a test suite worth trusting.
 updates:
-  # Three separate npm manifests, so three entries. Without them Dependabot
-  # only raises security alerts and never opens an update PR, which is how this
-  # repository accumulated advisories with fixes already published.
   - package-ecosystem: npm
     directory: /app/backend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
-    groups:
-      backend-dev:
-        dependency-type: development
+    open-pull-requests-limit: 0
 
   - package-ecosystem: npm
     directory: /app/frontend/library-frontend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
-    groups:
-      # One PR for the framework rather than several that must land together.
-      react:
-        patterns:
-          - react
-          - react-dom
-          - react-router-dom
-      mui:
-        patterns:
-          - '@mui/*'
-          - '@emotion/*'
-      build:
-        patterns:
-          - vite
-          - '@vitejs/*'
+    open-pull-requests-limit: 0
 
   - package-ecosystem: pip
     directory: /app/backend/ai
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
-
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: monthly
-
-  - package-ecosystem: devcontainers
-    directory: /
-    schedule:
-      interval: monthly
+    open-pull-requests-limit: 0
 
   - package-ecosystem: terraform
     directory: /infrastructure
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
