@@ -239,27 +239,14 @@ ollama pull nomic-embed-text   # Embedding model (768-dimensional)
 ollama pull llama3.2:3b         # LLM for natural language responses
 ```
 
-### 4. Add the VECTOR Column to SQL Server
-Run these SQL statements against your Library database:
-
-```sql
--- Add VECTOR column for embeddings (768-dimensional for nomic-embed-text)
-ALTER TABLE books
-ADD description_embedding VECTOR(768) NULL;
-
--- Create index for optimal vector search performance
-CREATE INDEX IX_books_description_embedding
-ON books(description_embedding);
-```
-
-### 5. Install Python Dependencies
+### 4. Install Python Dependencies
 
 ```bash
 cd app/backend/ai
 pip install -r requirements.txt
 ```
 
-### 6. Configure the Python Environment
+### 5. Configure the Python Environment
 
 Copy the `.env.example` template and fill in your credentials:
 
@@ -276,16 +263,48 @@ MSSQL_CONNECTION_STRING=Server=<your-server>;Database=Library;UID=<your-username
 > [!IMPORTANT]
 > The Python service uses ADO.NET-style connection strings with `UID` and `PWD` (not `User Id` and `Password`). This is a different format from the Node.js backend's `.env` file.
 
-### 7. Generate Embeddings
+### 6. Generate Embeddings
 
 ```bash
 cd app/backend/ai
 python backfill_embeddings.py
 ```
 
-This generates 768-dimensional vector embeddings for all books using the `nomic-embed-text` model and stores them in the `description_embedding` column.
+This adds the `description_embedding VECTOR(768)` column if it is missing, then
+generates 768-dimensional embeddings for every book with the `nomic-embed-text`
+model and stores them. Re-running it is safe.
 
-### 8. Start the Chat Service
+> [!NOTE]
+> **On vector indexes.** A vector index is optional here, and on SQL Server 2025
+> it is a trade. `CREATE INDEX` does not work on a vector column at all:
+>
+> ```
+> Msg 1978: Column 'description_embedding' in table 'dbo.books' is of a type
+> that is invalid for use as a key column in an index or statistics.
+> ```
+>
+> The correct statement is `CREATE VECTOR INDEX`, which on SQL Server 2025 also
+> needs `PREVIEW_FEATURES` switched on:
+>
+> ```sql
+> ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON;
+>
+> CREATE VECTOR INDEX IX_books_description_embedding
+> ON dbo.books(description_embedding)
+> WITH (METRIC = 'cosine', TYPE = 'DiskANN');
+> ```
+>
+> But on SQL Server 2025 that makes the table read-only, so `POST /books` starts
+> failing with `Msg 42231: Data modification statement failed because table
+> 'books' has a vector index on it`. Full DML alongside a vector index is
+> available on Azure SQL Database and SQL database in Microsoft Fabric with the
+> latest index version, not on a local SQL Server 2025 container.
+>
+> `VECTOR_DISTANCE` works without an index, as an exact scan, which is ample for
+> a 194-row library. This is why the setup script creates the column and not the
+> index.
+
+### 7. Start the Chat Service
 
 ```bash
 cd app/backend/ai
