@@ -1,0 +1,56 @@
+version: 2
+
+updates:
+  # Three separate npm manifests, so three entries. Without them Dependabot
+  # only raises security alerts and never opens an update PR, which is how this
+  # repository accumulated advisories with fixes already published.
+  - package-ecosystem: npm
+    directory: /app/backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      backend-dev:
+        dependency-type: development
+
+  - package-ecosystem: npm
+    directory: /app/frontend/library-frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for the framework rather than several that must land together.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - react-router-dom
+      mui:
+        patterns:
+          - '@mui/*'
+          - '@emotion/*'
+      build:
+        patterns:
+          - vite
+          - '@vitejs/*'
+
+  - package-ecosystem: pip
+    directory: /app/backend/ai
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: terraform
+    directory: /infrastructure
+    schedule:
+      interval: monthly
